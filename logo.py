@@ -96,6 +96,10 @@ def repetition(times, func):
 
 class Evaluator(object):
     def __init__(self, env=None):
+        add = lambda a,b: a+b
+        sub = lambda a,b: a-b
+        mul = lambda a,b: a*b
+        div = lambda a,b: a/b
         math_primitives = {
             "+": Primitive(add, 2),     "-": Primitive(sub, 2), 
             "*": Primitive(mul, 2),     "/": Primitive(div, 2),
@@ -183,12 +187,8 @@ if __name__ == "__main__":
     from sys import argv, stdin
     from zumoturtle import forward, backward, turnLeft, turnRight, setSpeed
 
-    def wrap_print(text): print text
-
-    add = lambda a,b: a+b
-    sub = lambda a,b: a-b
-    mul = lambda a,b: a*b
-    div = lambda a,b: a/b
+    def wrap_print(text): 
+        print text
 
     primitives_fr = {
         "ga": Primitive(turnLeft),  "gauche": Primitive(turnLeft),
