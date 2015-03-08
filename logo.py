@@ -145,19 +145,19 @@ class Evaluator(object):
         analyze(tokens, index) -> (lambda(env), next index)
         """
         res = None
-        tok = tokens[i]
+        tok = tokens[i].lower()
         i += 1
 
         if tok.isdigit():
             return const(int(tok)), i
 
         elif tok == '"':
-            res = ""
+            words = []
             while tokens[i] != '"':
-                res += " " + tokens[i]
+                words.append(tokens[i])
                 i += 1
             i += 1
-            return const(res), i
+            return const(" ".join(words)), i
 
         elif tok == "repete":
             return self.analyze_repetition(tokens, i)
@@ -177,7 +177,7 @@ class Evaluator(object):
             return Env.lookup(tok), i
 
     def eval(self, text):
-        tokens = text.lower().replace('[', ' [ ').replace(']', ' ] ').replace('"', ' " ').split()
+        tokens = text.replace('[', ' [ ').replace(']', ' ] ').replace('"', ' " ').split()
         i, prog = 0, []
         while i < len(tokens):
             func, i = self.analyze(tokens, i)
