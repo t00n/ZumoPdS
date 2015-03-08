@@ -10,11 +10,13 @@ Example LOGO program
     repete 10 [carre 10 dr 36]
 """
 
+import math
+
 # http://slps.github.io/zoo/logo/sdf.html
 
-from zumoturtle import forward, backward, turnLeft, turnRight, setSpeed
-
 class Env(object):
+    """An environment object, referencing its outer environment"""
+
     def __init__(self, parent=None, **content):
         self.parent = parent
         self.content = {k: v for k, v in content.iteritems()}
@@ -36,34 +38,39 @@ class Env(object):
             return key in self.parent
         return False
 
+    @classmethod
+    def lookup(klass, name):
+        """Return a lambda(env) -> env[name]"""
+        return lambda env: env[name]
+
 class Callable(object):
     pass
 
 class Procedure(Callable):
     """A user defined procedure, with named arguments"""
 
-    def __init__(self, args, body):
-        self.args = args
+    def __init__(self, arg_names, body):
+        self.arg_names = arg_names
         self.body = body
 
     @property
     def arity(self):
-        return len(self.args)
+        return len(self.arg_names)
 
     def call(self, env, args):
-        bound_args = dict(zip(self.args, args))
+        bound_args = dict(zip(self.arg_names, args))
         env = Env(parent=env, **bound_args)
         return self.body(env)
 
 class Primitive(Callable):
     """A logo primitive, with unnamed arguments"""
 
-    def __init__(self, func, arity):
+    def __init__(self, func, arity=1):
         self.func = func
         self.arity = arity
 
     def call(self, env, args):
-        self.func(*args)
+        return self.func(*args)
 
 class ParseError(Exception):
     pass
@@ -87,99 +94,116 @@ def repetition(times, func):
         return times
     return f
 
-def env_lookup(name):
-    """Return a lambda(env) that returns the value associated to name in env"""
-    return lambda env: env[name]
+class Evaluator(object):
+    def __init__(self, env=None):
+        math_primitives = {
+            "+": Primitive(add, 2),     "-": Primitive(sub, 2), 
+            "*": Primitive(mul, 2),     "/": Primitive(div, 2),
+            "sin": Primitive(math.sin), "cos": Primitive(math.cos),
+        }
+        self.env = Env(parent=env, **math_primitives)
 
-def logo_analyze_repetition(tokens, procedures):
-    times = int(tokens[0])
-    if tokens[1] != "[":
-        raise ParseError("Missing '['")
-    tokens = tokens[2:]
-    funcs = []
-    while tokens[0] != "]":
-        f, tokens = logo_analyze(tokens, procedures)
-        funcs.append(f)
-    tokens = tokens[1:]
-    return repetition(times, sequentially(funcs)), tokens
+    def analyze_repetition(self, tokens, i):
+        times = int(tokens[i])
+        if tokens[i+1] != "[":
+            raise ParseError("Missing '['")
+        i += 2
 
-def logo_analyze_procedure(tokens, procedures):
-    name = tokens[0]
-    args = []
+        funcs = []
+        while tokens[i] != "]":
+            f, i = self.analyze(tokens, i)
+            funcs.append(f)
+        
+        return repetition(times, sequentially(funcs)), i+1
 
-    i = 1
-    while tokens[i][0] == ':':
-        args.append(tokens[i])
+    def analyze_procedure(self, tokens, i):
+        name = tokens[i]
         i += 1
-    tokens = tokens[i:]
 
-    funcs = []
-    while tokens[0] != "fin":
-        f, tokens = logo_analyze(tokens, procedures)
-        funcs.append(f)
-    tokens = tokens[1:]
+        args = []
+        while tokens[i][0] == ':':
+            args.append(tokens[i])
+            i += 1
 
-    body = sequentially(funcs)
-    procedures[name] = Procedure(args, body)
-    return None, tokens
+        funcs = []
+        while tokens[i] != "fin":
+            f, i = self.analyze(tokens, i)
+            funcs.append(f)
 
-def logo_analyze_call(proc_name, tokens, procedures):
-    proc = procedures[proc_name]
-    args = []
-    for i in range(proc.arity):
-        arg, tokens = logo_analyze(tokens, procedures)
-        args.append(arg)
-    return lambda env: proc.call(env, map(lambda x: x(env), args)), tokens
+        body = sequentially(funcs)
+        self.env[name] = Procedure(args, body)
+        return None, i+1
 
-def logo_analyze(tokens, procedures):
-    """
-    analyze(tokens, procedures) -> (lambda(env), remaining tokens)
-    """
-    res = None
-    tok, tokens = tokens[0], tokens[1:]
+    def analyze(self, tokens, i):
+        """
+        analyze(tokens, index) -> (lambda(env), next index)
+        """
+        res = None
+        tok = tokens[i]
+        i += 1
 
-    if tok.isdigit():
-        return const(int(tok)), tokens
+        if tok.isdigit():
+            return const(int(tok)), i
 
-    elif tok == "repete":
-        return logo_analyze_repetition(tokens, procedures)
+        elif tok == '"':
+            res = ""
+            while tokens[i] != '"':
+                res += " " + tokens[i]
+                i += 1
+            i += 1
+            return const(res), i
 
-    elif tok == "pour":
-        return logo_analyze_procedure(tokens, procedures)
+        elif tok == "repete":
+            return self.analyze_repetition(tokens, i)
 
-    elif tok in procedures:
-        return logo_analyze_call(tok, tokens, procedures)
+        elif tok == "pour":
+            return self.analyze_procedure(tokens, i)
 
-    else:
-        return env_lookup(tok), tokens
+        elif tok in self.env and isinstance(self.env[tok], Callable):
+            proc = self.env[tok]
+            args = []
+            for argno in range(proc.arity):
+                arg, i = self.analyze(tokens, i)
+                args.append(arg)
+            return lambda env: proc.call(env, map(lambda x: x(env), args)), i
 
-def logo_eval(text):
-    tokens = text.lower().replace('[', ' [ ').replace(']', ' ] ').split()
-    env = Env(
-        ga=Primitive(turnLeft, 1), 
-        dr=Primitive(turnRight, 1), 
-        av=Primitive(forward, 1), 
-        re=Primitive(backward, 1), 
-        vi=Primitive(setSpeed, 1)
-    )
+        else:
+            return Env.lookup(tok), i
 
-    try:
-        prog = []
-        while len(tokens) > 0:
-            func, tokens = logo_analyze(tokens, env)
+    def eval(self, text):
+        tokens = text.lower().replace('[', ' [ ').replace(']', ' ] ').replace('"', ' " ').split()
+        i, prog = 0, []
+        while i < len(tokens):
+            func, i = self.analyze(tokens, i)
             if func is not None:
                 prog.append(func)
-        return sequentially(prog)(env)
-    except:
-        print "Error !"
-        return None
+        return sequentially(prog)(self.env)
 
 if __name__ == "__main__":
     from sys import argv, stdin
+    from zumoturtle import forward, backward, turnLeft, turnRight, setSpeed
+
+    def wrap_print(text): print text
+
+    add = lambda a,b: a+b
+    sub = lambda a,b: a-b
+    mul = lambda a,b: a*b
+    div = lambda a,b: a/b
+
+    primitives_fr = {
+        "ga": Primitive(turnLeft),  "gauche": Primitive(turnLeft),
+        "dr": Primitive(turnRight), "droite": Primitive(turnRight),
+        "av": Primitive(forward),   "avance": Primitive(forward),
+        "re": Primitive(backward),  "recule": Primitive(backward),
+        "vi": Primitive(setSpeed),  "vitesse": Primitive(setSpeed),
+        "p": Primitive(wrap_print), "print": Primitive(wrap_print),
+    }
+
+    interpreter = Evaluator(env=Env(**primitives_fr))
 
     inFile = stdin
     if len(argv) > 1:
         inFile = open(argv[1])
-    retval = logo_eval(inFile.read())
+    retval = interpreter.eval(inFile.read())
     print " =>", retval
 
