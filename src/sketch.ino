@@ -51,7 +51,6 @@ void setup(){
     Bridge.begin();
     Console.begin();
     while (! Console);
-    Console.println("Welcome to ZumoRobot");
 }
 
 bool executeCommand(char *command){

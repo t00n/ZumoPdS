@@ -84,7 +84,9 @@ def sequentially(functions):
     Return a lambda(env) executing functions sequentially, 
     returning the last one retval
     """
-    return lambda env: map(lambda f: f(env), functions).pop()
+    if len(functions) > 0:
+        return lambda env: map(lambda f: f(env), functions).pop()
+    return lambda env: None
 
 def repetition(times, func):
     """Return a lambda(env) executing a function multiple times"""
@@ -197,13 +199,24 @@ if __name__ == "__main__":
         "re": Primitive(backward),  "recule": Primitive(backward),
         "vi": Primitive(setSpeed),  "vitesse": Primitive(setSpeed),
         "p": Primitive(wrap_print), "print": Primitive(wrap_print),
+        "q": Primitive(exit, 0),
     }
 
     interpreter = Evaluator(env=Env(**primitives_fr))
 
-    inFile = stdin
     if len(argv) > 1:
-        inFile = open(argv[1])
-    retval = interpreter.eval(inFile.read())
-    print " =>", retval
+        for script in argv[1:]:
+            retval = interpreter.eval(open(script).read())
+            print " =>", retval
+    else:
+        while True:
+            try:
+                retval = interpreter.eval(raw_input(" > "))
+                print " => ", retval
+            except KeyboardInterrupt:
+                print
+                continue
+            except EOFError:
+                print
+                break
 
