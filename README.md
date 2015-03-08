@@ -3,6 +3,8 @@
 Code pour l'atelier "Programmation de robots" organisé par UrLab au
 [Printemps des Sciences](http://www.ulb.ac.be/inforsciences3/pds/index.html) 2015
 
+[![Build Status](https://travis-ci.org/UrLab/ZumoPdS.svg)](https://travis-ci.org/UrLab/ZumoPdS)
+
 ## Installation
 
 ### Initialiser le repo
