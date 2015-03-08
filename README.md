@@ -5,8 +5,32 @@ Code pour l'atelier "Programmation de robots" organisé par UrLab au
 
 ## Installation
 
+### Initialiser le repo
+
+    git clone git@github.com:UrLab/ZumoPdS.git
     git submodule init
     git submodule update
+
+### Utiliser Arduino 1.6+
+
+* Exécuter `install-arduino-sketch.sh`
+
+### Initialiser l'Arduino Yun
+
+* Appuyer plus de 30 secondes sur le bouton "reset wan" (factory settings)
+* Se connecter au wifi de l'Arduino
+* Changer le nom de l'Arduino en Robot, mettre un mot de passe
+
+### Uploader le code
+
+* Aller dans l'Arduino IDE, File > Sketch > ZumoPds
+* Tools > Board > Arduino Yun
+* Tools > Serial Port > Robot @ 192.168.240.1
+* Cliquer sur le bouton "upload"
+
+### Tester le script carre.logo
+
+    make run
 
 ## Ressources
 
