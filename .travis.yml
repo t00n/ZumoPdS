@@ -3,4 +3,4 @@ before_install:
  - pip install pytest
 
 script: 
- - "py.test test_logo.py"
+ - "cd pylogo && py.test test_logo.py"
