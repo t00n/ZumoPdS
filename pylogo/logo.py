@@ -97,9 +97,11 @@ def sequentially(functions):
     Return a lambda(env) executing functions sequentially, 
     returning the last one retval
     """
-    if len(functions) > 0:
+    if len(functions) > 1:
         return lambda env: map(lambda f: f(env), functions).pop()
-    return lambda env: None
+    elif len(functions) == 1:
+        return functions[0]
+    return const(None)
 
 def repetition(times, func):
     """Return a lambda(env) executing a function multiple times"""
@@ -109,25 +111,40 @@ def repetition(times, func):
         return times
     return f
 
+def conditional(condition, consequence, alternate):
+    def f(env):
+        if condition(env):
+            return consequence(env)
+        else:
+            return alternate(env)
+    return f
+
 class Evaluator(object):
     Keywords_fr = {
         "LOOP": "repete", 
         "DEF_PROC": "pour",
-        "END_PROC": "fin"
+        "END_PROC": "fin",
+        "IF": "si", 
+        "ELSE": "sinon",
     }
 
-    Add = lambda a,b: a+b
-    Sub = lambda a,b: a-b
-    Mul = lambda a,b: a*b
-    Div = lambda a,b: a/b
-    Math_primitives = {
-        "+": Primitive(Add, 2),     "-": Primitive(Sub, 2), 
-        "*": Primitive(Mul, 2),     "/": Primitive(Div, 2),
-        "sin": Primitive(math.sin), "cos": Primitive(math.cos),
+    Builtin_primitives = {
+        "+": Primitive(lambda a,b: a+b, 2),
+        "-": Primitive(lambda a,b: a-b, 2),
+        "*": Primitive(lambda a,b: a*b, 2),
+        "/": Primitive(lambda a,b: a/b, 2),
+        "<": Primitive(lambda a,b: a<b, 2),
+        "<=": Primitive(lambda a,b: a<=b, 2),
+        "=": Primitive(lambda a,b: a==b, 2),
+        ">=": Primitive(lambda a,b: a>=b, 2),
+        ">": Primitive(lambda a,b: a>b, 2),
+        "sin": Primitive(math.sin),
+        "cos": Primitive(math.cos),
+        "tan": Primitive(math.tan),
     }
 
     def __init__(self, env=None, keywords=Keywords_fr):
-        self.env = Env(parent=env, **self.Math_primitives)
+        self.env = Env(parent=env, **self.Builtin_primitives)
         self.keywords = keywords
 
     def analyze_list(self, tokens, i):
@@ -193,6 +210,14 @@ class Evaluator(object):
             raise UnterminatedExpression("Missing loop body")
         return repetition(times, expr), i
 
+    def analyze_if(self, tokens, i):
+        cond, i = self.analyze(tokens, i)
+        cons, i = self.analyze(tokens, i)
+        alt = const(None)
+        if i < len(tokens) and tokens[i] == self.keywords["ELSE"]:
+            alt, i = self.analyze(tokens, i+1)
+        return conditional(cond, cons, alt), i
+
     def analyze(self, tokens, i):
         """
         analyze(tokens, index) -> (lambda(env), next index)
@@ -209,6 +234,9 @@ class Evaluator(object):
 
         elif tok == '[':
             return self.analyze_list(tokens, i)
+
+        elif tok == self.keywords["IF"]:
+            return self.analyze_if(tokens, i)
 
         elif tok == self.keywords["LOOP"]:
             return self.analyze_loop(tokens, i)
@@ -272,6 +300,7 @@ if __name__ == "__main__":
         "re": P(backward),  "recule": P(backward),
         "vi": P(setSpeed),  "vitesse": P(setSpeed),
         "p": P(wrap_print), "print": P(wrap_print),
+        "racine": P(math.sqrt), "rc": P(math.sqrt),
         "q": P(exit, 0),
     }
 
