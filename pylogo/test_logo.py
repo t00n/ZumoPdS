@@ -30,3 +30,16 @@ def test_eval_proc():
 
 def test_my_primitive():
     assert logo_eval("f 41", f=Primitive(lambda n: n + 1)) == 42
+
+def test_closure():
+    source = """
+    pour addition :a :b
+      pour add :n 
+        + :a :n 
+      fin
+      add :b
+    fin
+    addition 16 26
+    """
+    assert logo_eval(source) == 42
+

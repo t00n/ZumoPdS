@@ -158,7 +158,7 @@ class Evaluator(object):
         except IndexError:
             raise UnterminatedExpression("Unterminated procedure definition")
 
-        body = sequentially(funcs)
+        body = sequentially(filter(lambda x: x is not None, funcs))
         self.env[name] = Procedure(args, body)
         return None, i+1
 
