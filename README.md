@@ -32,6 +32,7 @@ Code pour l'atelier "Programmation de robots" organisé par UrLab au
 
 ### Tester le script carre.logo
 
+    cd pylogo
     make run
 
 ## Ressources

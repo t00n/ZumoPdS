@@ -1,0 +1,5 @@
+pour carre :taille
+    repete 4 [ av :taille dr 90 ]
+fin
+
+repete 10 [carre 150 dr 36]
