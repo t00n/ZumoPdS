@@ -149,7 +149,7 @@ def test_comment():
     increment 41
     """
     assert logo_eval(source) == 42
-    
+
 
 def test_recursion():
     source = """
@@ -181,3 +181,8 @@ def test_infix_operator():
 def test_infix_condition():
     assert logo_eval('si 3 < 4 "oui" sinon "non"') == "oui"
     assert logo_eval('si 3 > 4 "oui" sinon "non"') == "non"
+
+
+def test_priority():
+    assert logo_eval('(3*3) + (4*4)') == 25
+    assert logo_eval('3 * (3+4) * 4') == 84

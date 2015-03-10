@@ -254,12 +254,21 @@ class Evaluator(object):
     def analyze_infix_operator(self, operand, tokens, i):
         op = tokens[i]
         proc = self.Builtin_operators[op]
-        print "Analyze infix operator", op
         try:
             other, i = self.analyze(tokens, i+1)
         except IndexError:
             raise UnterminatedExpression("Missing operand for " + op)
         return lambda env: proc.call(env, (operand(env), other(env))), i
+
+    def analyze_parenthesis(self, tokens, i):
+        expr = None
+        try:
+            expr, i = self.analyze(tokens, i)
+        except IndexError:
+            raise UnterminatedExpression("Missing expression after '('")
+        if i >= len(tokens) or tokens[i] != ')':
+            raise UnterminatedExpression("Missing matching ')'")
+        return expr, i+1
 
     def analyze(self, tokens, i):
         """
@@ -277,6 +286,9 @@ class Evaluator(object):
 
         elif tok == '[':
             res, i = self.analyze_list(tokens, i)
+
+        elif tok == '(':
+            res, i = self.analyze_parenthesis(tokens, i)
 
         elif tok == self.keywords["IF"]:
             res, i = self.analyze_if(tokens, i)
@@ -303,7 +315,7 @@ class Evaluator(object):
 
     def eval(self, text):
         text = re.sub(';.*\n', ' ', text)
-        tokens = re.sub(r'([<>]=?|=|"|\[|\]|\+|\-|\*|\/)', " \\1 ", text).split()
+        tokens = re.sub(r'([<>]=?|=|"|\(|\)|\[|\]|\+|\-|\*|\/)', " \\1 ", text).split()
         i, prog = 0, []
         while i < len(tokens):
             func, i = self.analyze(tokens, i)
