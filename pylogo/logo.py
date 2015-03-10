@@ -52,6 +52,12 @@ class Env(object):
             return key in self.parent
         return False
 
+    def keys(self):
+        res = set(self.content.keys())
+        if self.parent:
+            res = res | self.parent.keys()
+        return res
+
     @classmethod
     def lookup(klass, name):
         """Return a lambda(env) -> env[name]"""
@@ -322,58 +328,3 @@ class Evaluator(object):
             if func is not None:
                 prog.append(func)
         return sequentially(prog)(self.env)
-
-    def repl(self, user_input=raw_input):
-        text, prompt = "", " > "
-        while True:
-            try:
-                text += user_input(prompt)
-                retval = self.eval(text)
-                text, prompt = "", "> "
-                print " =>", retval
-            except UnterminatedExpression:
-                text += "\n"
-                prompt = " ... "
-            except ParseError as err:
-                print "\033[31;1m[ERROR]\033[0m Syntax error in code"
-                print "%s: %s" % (err.__class__.__name__, err)
-                text, prompt = "", "> "
-            except ProgramError as err:
-                print "\033[31;1m[ERROR]\033[0m Error while running program"
-                print "%s: %s" % (err.__class__.__name__, err)
-                text, prompt = "", "> "
-            except KeyboardInterrupt:
-                print
-                text, prompt = "", "> "
-                continue
-            except EOFError:
-                print
-                break
-
-if __name__ == "__main__":
-    from sys import argv, stdin
-    from zumoturtle import forward, backward, turnLeft, turnRight, setSpeed
-    import traceback
-
-    def wrap_print(text): 
-        print text
-
-    P = Primitive
-    primitives_fr = {
-        "ga": P(turnLeft),  "gauche": P(turnLeft),
-        "dr": P(turnRight), "droite": P(turnRight),
-        "av": P(forward),   "avance": P(forward),
-        "re": P(backward),  "recule": P(backward),
-        "vi": P(setSpeed),  "vitesse": P(setSpeed),
-        "p": P(wrap_print), "print": P(wrap_print),
-        "racine": P(math.sqrt), "rc": P(math.sqrt),
-        "q": P(exit, 0),
-    }
-
-    if len(argv) > 1:
-        for script in argv[1:]:
-            retval = Evaluator(env=Env(**primitives_fr)).eval(open(script).read())
-            print " =>", retval
-    else:
-        Evaluator(env=Env(**primitives_fr)).repl()
-
