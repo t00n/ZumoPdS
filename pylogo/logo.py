@@ -251,6 +251,16 @@ class Evaluator(object):
             alt, i = self.analyze(tokens, i+1)
         return conditional(cond, cons, alt), i
 
+    def analyze_infix_operator(self, operand, tokens, i):
+        op = tokens[i]
+        proc = self.Builtin_operators[op]
+        print "Analyze infix operator", op
+        try:
+            other, i = self.analyze(tokens, i+1)
+        except IndexError:
+            raise UnterminatedExpression("Missing operand for " + op)
+        return lambda env: proc.call(env, (operand(env), other(env))), i
+
     def analyze(self, tokens, i):
         """
         analyze(tokens, index) -> (lambda(env), next index)
@@ -260,31 +270,36 @@ class Evaluator(object):
         i += 1
 
         if tok[0].isdigit():
-            return self.analyze_number(tok, tokens, i)
+            res, i = self.analyze_number(tok, tokens, i)
 
         elif tok == '"':
-            return self.analyze_string(tokens, i)
+            res, i = self.analyze_string(tokens, i)
 
         elif tok == '[':
-            return self.analyze_list(tokens, i)
+            res, i = self.analyze_list(tokens, i)
 
         elif tok == self.keywords["IF"]:
-            return self.analyze_if(tokens, i)
+            res, i = self.analyze_if(tokens, i)
 
         elif tok == self.keywords["LOOP"]:
-            return self.analyze_loop(tokens, i)
+            res, i = self.analyze_loop(tokens, i)
 
         elif tok == self.keywords["DEF_PROC"]:
-            return self.analyze_procedure(tokens, i)
+            res, i = self.analyze_procedure(tokens, i)
 
         elif tok == self.keywords["MAKE_VAR"]:
-            return self.analyze_var(tokens, i)
+            res, i = self.analyze_var(tokens, i)
 
         elif tok in self.env and isinstance(self.env[tok], Callable):
-            return self.analyze_call(self.env[tok], tokens, i)
+            res, i = self.analyze_call(self.env[tok], tokens, i)
             
         else:
-            return Env.lookup(tok), i
+            res, i = Env.lookup(tok), i
+
+        if i < len(tokens) and tokens[i] in self.Builtin_operators:
+            res, i = self.analyze_infix_operator(res, tokens, i)
+
+        return res, i
 
     def eval(self, text):
         text = re.sub(';.*\n', ' ', text)
@@ -312,7 +327,7 @@ class Evaluator(object):
                 print "%s: %s" % (err.__class__.__name__, err)
                 text, prompt = "", "> "
             except ProgramError as err:
-                print "\033[31;1m[ERROR]\033[0m Error in running program"
+                print "\033[31;1m[ERROR]\033[0m Error while running program"
                 print "%s: %s" % (err.__class__.__name__, err)
                 text, prompt = "", "> "
             except KeyboardInterrupt:

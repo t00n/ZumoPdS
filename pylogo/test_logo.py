@@ -113,7 +113,11 @@ def test_loop():
 
 
 def test_sequentially():
-    assert logo_eval("+ 3 4 + 5 6") == 11
+    source = """
+    3 + 4
+    5 + 6
+    """
+    assert logo_eval(source) == 11
 
 
 def test_unidentified():
@@ -150,10 +154,10 @@ def test_comment():
 def test_recursion():
     source = """
     pour fac :n
-      si <= :n 1
+      si :n <= 1
         1
       sinon
-        * :n fac - :n 1
+        :n * fac :n - 1
     fin
 
     fac 4
@@ -167,3 +171,13 @@ def test_var():
     variable
     """
     assert logo_eval(source) == 42
+
+
+def test_infix_operator():
+    assert logo_eval("23 + 19") == 42
+    assert logo_eval("71 - 29") == 42
+
+
+def test_infix_condition():
+    assert logo_eval('si 3 < 4 "oui" sinon "non"') == "oui"
+    assert logo_eval('si 3 > 4 "oui" sinon "non"') == "non"
