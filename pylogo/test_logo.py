@@ -22,6 +22,9 @@ class Counter:
 def test_eval_const_int():
     assert logo_eval("3") == 3
 
+def test_eval_const_float():
+    assert logo_eval("3.14") == 3.14
+
 
 def test_eval_const_str():
     assert logo_eval('"This is a string"') == "This is a string"
@@ -129,6 +132,7 @@ def test_unterminated_proc():
         logo_eval("pour manger")
     with pytest.raises(UnterminatedExpression):
         logo_eval("pour manger av 10")
+
 
 def test_recursion():
     source = """

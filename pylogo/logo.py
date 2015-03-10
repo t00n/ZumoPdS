@@ -147,6 +147,14 @@ class Evaluator(object):
         self.env = Env(parent=env, **self.Builtin_primitives)
         self.keywords = keywords
 
+    def analyze_number(self, numbrepr, tokens, i):
+        res = None
+        try:
+            res = const(int(numbrepr))
+        except ValueError:
+            res = const(float(numbrepr))
+        return res, i
+
     def analyze_list(self, tokens, i):
         expr = []
         try:
@@ -229,8 +237,8 @@ class Evaluator(object):
         tok = tokens[i].lower()
         i += 1
 
-        if tok.isdigit():
-            return const(int(tok)), i
+        if tok[0].isdigit():
+            return self.analyze_number(tok, tokens, i)
 
         elif tok == '"':
             return self.analyze_string(tokens, i)
