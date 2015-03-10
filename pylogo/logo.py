@@ -11,6 +11,7 @@ Example LOGO program
 """
 
 import math
+import re
 
 # http://slps.github.io/zoo/logo/sdf.html
 
@@ -286,8 +287,8 @@ class Evaluator(object):
             return Env.lookup(tok), i
 
     def eval(self, text):
-        lines = filter(lambda line: not line.strip().startswith(';'), text.split('\n'))
-        tokens = ' '.join(lines).replace('[', ' [ ').replace(']', ' ] ').replace('"', ' " ').split()
+        text = re.sub(';.*\n', ' ', text)
+        tokens = re.sub(r'([<>]=?|=|"|\[|\]|\+|\-|\*|\/)', " \\1 ", text).split()
         i, prog = 0, []
         while i < len(tokens):
             func, i = self.analyze(tokens, i)
@@ -302,18 +303,21 @@ class Evaluator(object):
                 text += user_input(prompt)
                 retval = self.eval(text)
                 text, prompt = "", "> "
-                print " => ", retval
+                print " =>", retval
             except UnterminatedExpression:
                 text += "\n"
                 prompt = " ... "
             except ParseError as err:
                 print "\033[31;1m[ERROR]\033[0m Syntax error in code"
                 print "%s: %s" % (err.__class__.__name__, err)
+                text, prompt = "", "> "
             except ProgramError as err:
                 print "\033[31;1m[ERROR]\033[0m Error in running program"
                 print "%s: %s" % (err.__class__.__name__, err)
+                text, prompt = "", "> "
             except KeyboardInterrupt:
                 print
+                text, prompt = "", "> "
                 continue
             except EOFError:
                 print

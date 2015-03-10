@@ -64,6 +64,7 @@ def test_eval_if():
 def test_eval_cmp():
     assert logo_eval('si < 3 4 "oui" sinon "non"') == "oui"
     assert logo_eval('si < 4 4 "oui" sinon "non"') == "non"
+    assert logo_eval('si < 4 4 "oui"') == None
 
     assert logo_eval('si <= 4 4 "oui" sinon "non"') == "oui"
     assert logo_eval('si <= 5 4 "oui" sinon "non"') == "non"
@@ -133,6 +134,18 @@ def test_unterminated_proc():
     with pytest.raises(UnterminatedExpression):
         logo_eval("pour manger av 10")
 
+
+def test_comment():
+    source = """
+    pour increment :n
+      ; Increment de n
+      + 1 :n ; Here is the Job
+    fin
+
+    increment 41
+    """
+    assert logo_eval(source) == 42
+    
 
 def test_recursion():
     source = """
