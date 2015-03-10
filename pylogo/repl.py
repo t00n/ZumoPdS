@@ -24,27 +24,29 @@ def repl_init_readline(interpreter):
 def repl(interpreter, user_input=raw_input):
     repl_init_readline(interpreter)
 
-    text, prompt = "", " > "
+    first_prompt = " (logo) > "
+    cont_prompt  = "    ... > "
+    text, prompt = "", first_prompt
     while True:
         try:
             text += user_input(prompt)
             retval = interpreter.eval(text)
-            text, prompt = "", "> "
+            text, prompt = "", first_prompt
             print " =>", retval
         except UnterminatedExpression:
             text += "\n"
-            prompt = " ... "
+            prompt = cont_prompt
         except ParseError as err:
             print "\033[31;1m[ERROR]\033[0m Syntax error in code"
             print "%s: %s" % (err.__class__.__name__, err)
-            text, prompt = "", "> "
+            text, prompt = "", first_prompt
         except ProgramError as err:
             print "\033[31;1m[ERROR]\033[0m Error while running program"
             print "%s: %s" % (err.__class__.__name__, err)
-            text, prompt = "", "> "
+            text, prompt = "", first_prompt
         except KeyboardInterrupt:
             print
-            text, prompt = "", "> "
+            text, prompt = "", first_prompt
             continue
         except EOFError:
             print
