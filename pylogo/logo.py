@@ -167,12 +167,17 @@ class Evaluator(object):
                 args.append(tokens[i])
                 i += 1
 
+            # Create procedure in env for recursion...
+            self.env[name] = Procedure(args, const(None))
+
             funcs = []
             while tokens[i] != self.keywords["END_PROC"]:
                 f, i = self.analyze(tokens, i)
                 funcs.append(f)
             body = sequentially(filter(lambda x: x is not None, funcs))
-            self.env[name] = Procedure(args, body)
+            
+            # Then bind its actual body
+            self.env[name].body = body
             return None, i+1
         except IndexError:
             raise UnterminatedExpression("Unterminated procedure definition")

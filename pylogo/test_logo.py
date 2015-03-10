@@ -129,3 +129,16 @@ def test_unterminated_proc():
         logo_eval("pour manger")
     with pytest.raises(UnterminatedExpression):
         logo_eval("pour manger av 10")
+
+def test_recursion():
+    source = """
+    pour fac :n
+      si <= :n 1
+        1
+      sinon
+        * :n fac - :n 1
+    fin
+
+    fac 4
+    """
+    assert logo_eval(source) == 24
