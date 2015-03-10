@@ -154,15 +154,14 @@ class Evaluator(object):
                 e, i = self.analyze(tokens, i)
                 expr.append(e)
         except IndexError:
-            raise UnterminatedExpression("Unterminated loop")
+            raise UnterminatedExpression("Unterminated list")
         
         return logo_list(expr), i+1
 
     def analyze_procedure(self, tokens, i):
-        name = tokens[i]
-        i += 1
-
         try:
+            name = tokens[i]
+            i += 1
             args = []
             while tokens[i][0] == ':':
                 args.append(tokens[i])
@@ -172,12 +171,11 @@ class Evaluator(object):
             while tokens[i] != self.keywords["END_PROC"]:
                 f, i = self.analyze(tokens, i)
                 funcs.append(f)
+            body = sequentially(filter(lambda x: x is not None, funcs))
+            self.env[name] = Procedure(args, body)
+            return None, i+1
         except IndexError:
             raise UnterminatedExpression("Unterminated procedure definition")
-
-        body = sequentially(filter(lambda x: x is not None, funcs))
-        self.env[name] = Procedure(args, body)
-        return None, i+1
 
     def analyze_string(self, tokens, i):
         words = []
