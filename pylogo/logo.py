@@ -126,9 +126,10 @@ class Evaluator(object):
         "END_PROC": "fin",
         "IF": "si", 
         "ELSE": "sinon",
+        "MAKE_VAR": "donne"
     }
 
-    Builtin_primitives = {
+    Builtin_operators = {
         "+": Primitive(lambda a,b: a+b, 2),
         "-": Primitive(lambda a,b: a-b, 2),
         "*": Primitive(lambda a,b: a*b, 2),
@@ -138,13 +139,20 @@ class Evaluator(object):
         "=": Primitive(lambda a,b: a==b, 2),
         ">=": Primitive(lambda a,b: a>=b, 2),
         ">": Primitive(lambda a,b: a>b, 2),
+    }
+
+    Builtin_primitives = {
         "sin": Primitive(math.sin),
         "cos": Primitive(math.cos),
         "tan": Primitive(math.tan),
     }
 
+    Builtin = {}
+    Builtin.update(Builtin_operators)
+    Builtin.update(Builtin_primitives)
+
     def __init__(self, env=None, keywords=Keywords_fr):
-        self.env = Env(parent=env, **self.Builtin_primitives)
+        self.env = Env(parent=env, **self.Builtin)
         self.keywords = keywords
 
     def analyze_number(self, numbrepr, tokens, i):
@@ -189,6 +197,19 @@ class Evaluator(object):
             return None, i+1
         except IndexError:
             raise UnterminatedExpression("Unterminated procedure definition")
+
+    def analyze_var(self, tokens, i):
+        try:
+            name = tokens[i]
+        except IndexError:
+            raise UnterminatedExpression("Missing variable name")
+
+        try:
+            value, i = self.analyze(tokens, i+1)
+        except IndexError:
+            raise UnterminatedExpression("Missing variable value")
+        self.env[name] = value(self.env)
+        return None, i
 
     def analyze_string(self, tokens, i):
         words = []
@@ -254,6 +275,9 @@ class Evaluator(object):
 
         elif tok == self.keywords["DEF_PROC"]:
             return self.analyze_procedure(tokens, i)
+
+        elif tok == self.keywords["MAKE_VAR"]:
+            return self.analyze_var(tokens, i)
 
         elif tok in self.env and isinstance(self.env[tok], Callable):
             return self.analyze_call(self.env[tok], tokens, i)

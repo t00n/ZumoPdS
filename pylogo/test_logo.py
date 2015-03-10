@@ -146,3 +146,11 @@ def test_recursion():
     fac 4
     """
     assert logo_eval(source) == 24
+
+
+def test_var():
+    source = """
+    donne variable 42
+    variable
+    """
+    assert logo_eval(source) == 42
