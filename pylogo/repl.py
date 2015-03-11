@@ -74,19 +74,22 @@ def main():
 
     P = Primitive
     primitives_fr = {
-        "ga": P(turnLeft),  "gauche": P(turnLeft),
-        "dr": P(turnRight), "droite": P(turnRight),
-        "av": P(forward),   "avance": P(forward),
-        "re": P(backward),  "recule": P(backward),
-        "vi": P(setSpeed),  "vitesse": P(setSpeed),
-        "p": P(wrap_print), "print": P(wrap_print),
-        "racine": P(math.sqrt), "rc": P(math.sqrt),
+        "ga": P(turnLeft, 1, "ga"),  "gauche": P(turnLeft, 1, "gauche"),
+        "dr": P(turnRight, 1, "dr"), "droite": P(turnRight, 1, "droite"),
+        "av": P(forward, 1, "av"),   "avance": P(forward, 1, "avance"),
+        "re": P(backward, 1, "re"),  "recule": P(backward, 1, "recule"),
+        "vi": P(setSpeed, 1, "vi"),  "vitesse": P(setSpeed, 1, "vitesse"),
+        "p": P(wrap_print, 1, "p"), "print": P(wrap_print, 1, "print"),
+        "racine": P(math.sqrt, 1, "racine"), "rc": P(math.sqrt, 1, "rc"),
         "q": P(exit, 0),
     }
 
     if len(argv) > 1:
         for script in argv[1:]:
-            retval = Evaluator(env=Env(**primitives_fr)).eval(open(script).read())
+            try:
+                retval = Evaluator(env=Env(**primitives_fr)).eval(open(script).read())
+            except Exception as err:
+                print "\033[1;31m[ERROR]\033[0m in execution of", script, ":", str(err)
     else:
         repl(Evaluator(env=Env(**primitives_fr)))
 

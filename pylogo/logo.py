@@ -64,12 +64,14 @@ class Env(object):
         return lambda env: env[name]
 
 class Callable(object):
-    pass
+    def __init__(self, name):
+        self.name = name
 
 class Procedure(Callable):
     """A user defined procedure, with named arguments"""
 
-    def __init__(self, arg_names, body):
+    def __init__(self, arg_names, body, name=''):
+        super(Procedure, self).__init__(name)
         self.arg_names = arg_names
         self.body = body
 
@@ -85,7 +87,8 @@ class Procedure(Callable):
 class Primitive(Callable):
     """A logo primitive, with unnamed arguments"""
 
-    def __init__(self, func, arity=1):
+    def __init__(self, func, arity=1, name=''):
+        super(Primitive, self).__init__(name)
         self.func = func
         self.arity = arity
 
@@ -137,21 +140,21 @@ class Evaluator(object):
     }
 
     Builtin_operators = {
-        "+": Primitive(lambda a,b: a+b, 2),
-        "-": Primitive(lambda a,b: a-b, 2),
-        "*": Primitive(lambda a,b: a*b, 2),
-        "/": Primitive(lambda a,b: a/b, 2),
-        "<": Primitive(lambda a,b: a<b, 2),
-        "<=": Primitive(lambda a,b: a<=b, 2),
-        "=": Primitive(lambda a,b: a==b, 2),
-        ">=": Primitive(lambda a,b: a>=b, 2),
-        ">": Primitive(lambda a,b: a>b, 2),
+        "+": Primitive(lambda a,b: a+b, 2, '+'),
+        "-": Primitive(lambda a,b: a-b, 2, '-'),
+        "*": Primitive(lambda a,b: a*b, 2, '*'),
+        "/": Primitive(lambda a,b: a/b, 2, '/'),
+        "<": Primitive(lambda a,b: a<b, 2, '<'),
+        "<=": Primitive(lambda a,b: a<=b, 2, '<='),
+        "=": Primitive(lambda a,b: a==b, 2, '='),
+        ">=": Primitive(lambda a,b: a>=b, 2, '>='),
+        ">": Primitive(lambda a,b: a>b, 2, '>'),
     }
 
     Builtin_primitives = {
-        "sin": Primitive(math.sin),
-        "cos": Primitive(math.cos),
-        "tan": Primitive(math.tan),
+        "sin": Primitive(math.sin, 1, "sin"),
+        "cos": Primitive(math.cos, 1, "cos"),
+        "tan": Primitive(math.tan, 1, "tan"),
     }
 
     Builtin = {}
@@ -191,7 +194,7 @@ class Evaluator(object):
                 i += 1
 
             # Create procedure in env for recursion...
-            self.env[name] = Procedure(args, const(None))
+            self.env[name] = Procedure(args, const(None), name)
 
             funcs = []
             while tokens[i] != self.keywords["END_PROC"]:
@@ -235,7 +238,9 @@ class Evaluator(object):
                 arg, i = self.analyze(tokens, i)
                 args.append(arg)
         except IndexError:
-            raise UnterminatedExpression("Missing arguments in call")
+            msg = "Missing arguments in call to %s. Expected %d; got %d" % (
+                procedure.name, procedure.arity, len(args))
+            raise UnterminatedExpression(msg)
         return lambda env: procedure.call(env, map(lambda x: x(env), args)), i
 
     def analyze_loop(self, tokens, i):
@@ -320,7 +325,7 @@ class Evaluator(object):
         return res, i
 
     def eval(self, text):
-        text = re.sub(';.*\n', ' ', text)
+        text = re.sub(r';.*\n', ' ', text)
         tokens = re.sub(r'([<>]=?|=|"|\(|\)|\[|\]|\+|\-|\*|\/)', " \\1 ", text).split()
         i, prog = 0, []
         while i < len(tokens):
