@@ -5,9 +5,14 @@ import traceback
 import math
 import os
 
+Autocomplete = []
+
 def repl_init_readline(interpreter):
     def get_completion(text, state):
-        match = filter(lambda x: x.startswith(text), interpreter.env.keys())
+        global Autocomplete
+        if state == 0:
+            Autocomplete = filter(lambda x: x.startswith(text), interpreter.env.keys())
+        return Autocomplete[state]
         try:
             return match[state]
         except IndexError as err:
@@ -28,13 +33,14 @@ def repl_init_readline(interpreter):
         readline.parse_and_bind('set editing-mode emacs')
         readline.set_completer(get_completion)
     except Exception as err:
-        print "Cannot setup readline (no advanced edition features)" + str(err)
+        print "\033[1;33m[WARNING]\033[0m Cannot setup readline:", str(err)
+        print "      ... No advanced command-line edition features"
 
 
 def repl(interpreter, user_input=raw_input):
     repl_init_readline(interpreter)
 
-    first_prompt = " (logo) > "
+    first_prompt = " \033[1m(\033[31ml\033[32mo\033[33mg\033[34mo\033[0;1m)\033[0m > "
     cont_prompt  = "    ... > "
     text, prompt = "", first_prompt
     while True:

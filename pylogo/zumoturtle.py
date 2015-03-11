@@ -27,9 +27,8 @@ try:
     def setSpeed(speed):
         send_32u4("ss %d\n", speed)
 
-except:
-    traceback.print_exc()
-    print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge..."
+except Exception as err:
+    print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
 
     def forward(length):
         print "  forward", length
