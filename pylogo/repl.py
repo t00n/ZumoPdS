@@ -3,6 +3,7 @@ from sys import argv, stdin
 from zumoturtle import forward, backward, turnLeft, turnRight, setSpeed
 import traceback
 import math
+import os
 
 def repl_init_readline(interpreter):
     def get_completion(text, state):
@@ -14,11 +15,20 @@ def repl_init_readline(interpreter):
 
     try:
         import readline
+        import atexit
+
+        histfile = os.path.join(os.path.expanduser("~"), ".logo_repl")
+        try:
+            readline.read_history_file(histfile)
+        except IOError:
+            pass
+        atexit.register(readline.write_history_file, histfile)
+
         readline.parse_and_bind('tab: complete')
         readline.parse_and_bind('set editing-mode emacs')
         readline.set_completer(get_completion)
     except Exception as err:
-        print "Error with readline lib (no advanced edition features)" + str(err)
+        print "Cannot setup readline (no advanced edition features)" + str(err)
 
 
 def repl(interpreter, user_input=raw_input):
