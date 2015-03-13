@@ -1,11 +1,11 @@
 .PHONY: all run
 
-all: pack.tar.gz.uploaded
+all: pack.tar.uploaded
 run: all
-	ssh root@Robot.local 'rm -f pack.tar && gunzip pack.tar.gz && tar xf pack.tar && python repl.py carre.logo'
+	ssh root@Robot.local 'tar xf pack.tar && python repl.py carre.logo'
 
-pack.tar.gz: logo.py repl.py zumoturtle.py carre.logo
-	tar c $^ | gzip > $@
+pack.tar: logo.py repl.py zumoturtle.py carre.logo
+	tar c $^ > $@
 
 %.uploaded: %
 	scp $< root@Robot.local: && touch $@
