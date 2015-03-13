@@ -2,12 +2,12 @@
 #include <Console.h>
 
 float leftAdjust = 1.04;
-static int speed = 200;
+static int speed = 150;
 ZumoMotors motors;
 
 static inline void setSpeeds(int left, int right, int wait){
     motors.setSpeeds(left*speed*leftAdjust, right*speed/leftAdjust);
-    delay(wait);
+    delay(5*wait);
     motors.setSpeeds(0, 0);
 }
 

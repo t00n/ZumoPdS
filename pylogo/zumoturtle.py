@@ -12,7 +12,7 @@ try:
     def send_cmd(cmd, param):
         param = int(param)
         cmdbytes = [ord(cmd), (param>>24)&0xff, (param>>16)&0xff, (param>>8)&0xff, param&0xff]
-        sock.sendall(''.join(cmdbytes))
+        sock.sendall(''.join(map(chr, cmdbytes)))
         while sock.recv(1) != '\n':
             pass
 
