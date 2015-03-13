@@ -1,6 +1,6 @@
 from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError
 from sys import argv, stdin
-from zumoturtle import forward, backward, turnLeft, turnRight
+from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor
 import traceback
 import math
 import os
@@ -73,25 +73,26 @@ def main():
         print text
 
     P = Primitive
-    primitives_fr = {
-        "ga": P(turnLeft, 1, "ga"),  "gauche": P(turnLeft, 1, "gauche"),
-        "dr": P(turnRight, 1, "dr"), "droite": P(turnRight, 1, "droite"),
-        "av": P(forward, 1, "av"),   "avance": P(forward, 1, "avance"),
-        "re": P(backward, 1, "re"),  "recule": P(backward, 1, "recule"),
-        "p": P(wrap_print, 1, "p"), "print": P(wrap_print, 1, "print"),
-        "racine": P(math.sqrt, 1, "racine"), "rc": P(math.sqrt, 1, "rc"),
-        "q": P(exit, 0),
-    }
+    primitives_fr = (
+        P(turnLeft, 1, "ga"),  P(turnLeft, 1, "gauche"),
+        P(turnRight, 1, "dr"), P(turnRight, 1, "droite"),
+        P(forward, 1, "av"),   P(forward, 1, "avance"),
+        P(backward, 1, "re"),  P(backward, 1, "recule"),
+        P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
+        P(getGroundSensor, 1, "sol"),
+        P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
+        P(exit, 0, "q"), P(exit, 0, "quit"),
+    )
 
     if len(argv) > 1:
         for script in argv[1:]:
             try:
-                retval = Evaluator(env=Env(**primitives_fr)).eval(open(script).read())
+                retval = Evaluator(env=Env(None, *primitives_fr)).eval(open(script).read())
             except Exception as err:
                 print "\033[1;31m[ERROR]\033[0m in execution of", script, ":", str(err)
                 traceback.print_exc()
     else:
-        repl(Evaluator(env=Env(**primitives_fr)))
+        repl(Evaluator(env=Env(None, *primitives_fr)))
 
 if __name__ == "__main__":
     main()

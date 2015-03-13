@@ -31,9 +31,11 @@ class UnknowIdentifier(ProgramError):
 class Env(object):
     """An environment object, referencing its outer environment"""
 
-    def __init__(self, parent=None, **content):
+    def __init__(self, parent=None, *callables, **content):
         self.parent = parent
         self.content = {k: v for k, v in content.iteritems()}
+        for func in callables:
+            self.content[func.name] = func
 
     def __getitem__(self, key):
         if key in self.content:

@@ -31,7 +31,7 @@ try:
         send_cmd("r", angle)
 
     def getGroundSensor(index):
-        send_cmd("s", index)
+        return int(send_cmd("s", index))
 
 except Exception as err:
     print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
