@@ -13,7 +13,7 @@ static int speed = 150;
 static unsigned int groundSensors[6];
 
 ZumoMotors motors;
-ZumoReflectanceSensorArray reflectArray(QTR_NO_EMITTER_PIN);
+ZumoReflectanceSensorArray reflectArray(ZUMO_SENSOR_ARRAY_DEFAULT_EMITTER_PIN);
 
 /* Helper to set motors speeds */
 static inline uint32_t setSpeeds(int left, int right, int wait){
