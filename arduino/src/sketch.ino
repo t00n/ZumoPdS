@@ -1,51 +1,54 @@
 #include <ZumoMotors.h>
 #include <Console.h>
 
-float leftAdjust = 1.08;
-static int speed = 150;
+float leftAdjust = 1.04;
+static int speed = 200;
 ZumoMotors motors;
 
+static inline void setSpeeds(int left, int right, int wait){
+    motors.setSpeeds(left*speed*leftAdjust, right*speed/leftAdjust);
+    delay(wait);
+    motors.setSpeeds(0, 0);
+}
+
+static inline void waitConsole(){
+    while (! (Console.connected() && Console.available()));
+}
+
 typedef struct LOGO_cmd_t {
-    char *name;
-    void(*procedure)(long);
+    char name;
+    void(*procedure)(uint32_t);
 } LOGO_cmd;
 
-void forward(long len){
-    motors.setSpeeds(speed*leftAdjust, speed);
-    delay(1000 * len / speed);
-    motors.setSpeeds(0, 0);
-}
+struct {
+    char name;
+    uint32_t param;
+} command;
 
-void backward(long len){
-    motors.setSpeeds(-speed*leftAdjust, -speed);
-    delay(1000 * len / speed);
-    motors.setSpeeds(0, 0);
-}
+void   forward(uint32_t len){setSpeeds( 1,  1, len);}
+void  backward(uint32_t len){setSpeeds(-1, -1, len);}
+void  turnLeft(uint32_t len){setSpeeds(-1,  1, len);}
+void turnRight(uint32_t len){setSpeeds( 1, -1, len);}
 
-void turnLeft(long len){
-    motors.setSpeeds(-speed*leftAdjust, speed);
-    delay(1000 * len / speed);
-    motors.setSpeeds(0, 0);
-}
-
-void turnRight(long len){
-    motors.setSpeeds(speed*leftAdjust, -speed);
-    delay(1000 * len / speed);
-    motors.setSpeeds(0, 0);
-}
-
-void setSpeed(long newSpeed){
-    if (0 < speed && speed < 500)
-        speed = newSpeed;
-}
-
+#define N_Commands sizeof(Commands)/sizeof(LOGO_cmd)
 LOGO_cmd Commands[] = {
-    {"forward", forward}, {"fw", forward},
-    {"backward", backward}, {"bw", backward},
-    {"turnLeft", turnLeft}, {"tl", turnLeft},
-    {"turnRight", turnRight}, {"tr", turnRight},
-    {"setSpeed", setSpeed}, {"ss", setSpeed}
+    {'f', forward},
+    {'b', backward},
+    {'l', turnLeft},
+    {'r', turnRight}
 };
+
+void readCommand(){
+    waitConsole();
+    command.name = Console.read();
+    command.param = 0;
+    for (int i=0; i<4; i++){
+        waitConsole();
+        if (i > 0)
+            command.param <<= 8;
+        command.param += Console.read();
+    }
+}
 
 void setup(){
     Bridge.begin();
@@ -53,50 +56,13 @@ void setup(){
     while (! Console);
 }
 
-bool executeCommand(char *command){
-    char *operand = strchr(command, ' ');
-    if (operand == NULL)
-        return false;
-
-    while (*operand == ' '){
-        *operand = '\0';
-        operand++;
-    }
-
-    char *end = NULL;
-    long value = strtol(operand, &end, 10);
-    if (end == operand)
-        return false;
-
-    for (int i=0; i<sizeof(Commands)/sizeof(LOGO_cmd); i++){
-        if (strcmp(Commands[i].name, command) == 0){
-            Commands[i].procedure(value);
-            return true;
-        }
-    }
-    return false;
-}
-
-int buflen = 0;
-char buffer[128] = {'\0'};
-
 void loop(){
-    if (Console.connected() && Console.available()){
-        if (buflen < sizeof(buffer)-1){
-            buffer[buflen] = Console.read();
-        } else {
-            memset(buffer, 0, sizeof(buffer));
-            buflen = 0;
-        }
-        buflen++;
-        if (buffer[buflen-1] == '\n'){
-            buffer[buflen] = '\0';
-            if (executeCommand(buffer)){
-                Console.print("# => ");
-                Console.println(buffer);
-            }
-            memset(buffer, 0, sizeof(buffer));
-            buflen = 0;
+    readCommand();
+    for (int i=0; i<N_Commands; i++){
+        if (Commands[i].name == command.name){
+            Commands[i].procedure(command.param);
+            Console.println(command.name);
+            return;
         }
     }
 }

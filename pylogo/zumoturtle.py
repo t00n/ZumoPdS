@@ -2,30 +2,31 @@ import traceback
 
 try:
     import socket
+    import atexit
     HOST = 'localhost'
     PORT = 6571
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((HOST, PORT))
+    atexit.register(sock.close)
 
-    def send_32u4(fmt, *args):
-        sock.sendall((fmt+"\n") % args)
-        while sock.recv(1) != "\n":
+    def send_cmd(cmd, param):
+        param = int(param)
+        cmdbytes = [ord(cmd), (param>>24)&0xff, (param>>16)&0xff, (param>>8)&0xff, param&0xff]
+        sock.sendall(''.join(cmdbytes))
+        while sock.recv(1) != '\n':
             pass
 
     def forward(length):
-        send_32u4("fw %d\n", length)
+        send_cmd("f", length)
 
     def backward(length):
-        send_32u4("bw %d\n", length)
+        send_cmd("b", length)
 
     def turnLeft(angle):
-        send_32u4("tl %d\n", angle)
+        send_cmd("l", angle)
 
     def turnRight(angle):
-        send_32u4("tr %d\n", angle)
-
-    def setSpeed(speed):
-        send_32u4("ss %d\n", speed)
+        send_cmd("r", angle)
 
 except Exception as err:
     print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
@@ -41,6 +42,3 @@ except Exception as err:
 
     def turnRight(angle):
         print "turnRight", angle
-
-    def setSpeed(speed):
-        print " setSpeed", speed
