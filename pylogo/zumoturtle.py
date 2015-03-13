@@ -1,5 +1,3 @@
-import traceback
-
 try:
     import socket
     import atexit
@@ -13,8 +11,12 @@ try:
         param = int(param)
         cmdbytes = [ord(cmd), (param>>24)&0xff, (param>>16)&0xff, (param>>8)&0xff, param&0xff]
         sock.sendall(''.join(map(chr, cmdbytes)))
-        while sock.recv(1) != '\n':
-            pass
+        resbuf = ""
+        got = sock.recv(1)
+        while got != '\n':
+            resbuf += got
+            got = sock.recv(1)
+        return resbuf.strip()
 
     def forward(length):
         send_cmd("f", length)
@@ -28,17 +30,16 @@ try:
     def turnRight(angle):
         send_cmd("r", angle)
 
+    def getGroundSensor(index):
+        send_cmd("s", index)
+
 except Exception as err:
     print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
 
-    def forward(length):
-        print "  forward", length
+    def do_print(text):
+        def f(*args):
+            print text, args
+        return f
 
-    def backward(length):
-        print " backward", length
-
-    def turnLeft(angle):
-        print " turnLeft", angle
-
-    def turnRight(angle):
-        print "turnRight", angle
+    for f in ('forward', 'backward', 'turnLeft', 'turnRight', 'getGroundSensor'):
+        globals()[f] = do_print(f)

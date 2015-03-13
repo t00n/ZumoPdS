@@ -1,52 +1,76 @@
 #include <ZumoMotors.h>
+#include <QTRSensors.h>
+#include <ZumoReflectanceSensorArray.h>
 #include <Console.h>
 
+/* Adjust coef for left/right motors not running at the same speed */
 float leftAdjust = 1.04;
-static int speed = 150;
-ZumoMotors motors;
 
-static inline void setSpeeds(int left, int right, int wait){
+/* Motors base speed */
+static int speed = 150;
+
+/* Ground sensors result array */
+static unsigned int groundSensors[6];
+
+ZumoMotors motors;
+ZumoReflectanceSensorArray reflectArray(QTR_NO_EMITTER_PIN);
+
+/* Helper to set motors speeds */
+static inline uint32_t setSpeeds(int left, int right, int wait){
     motors.setSpeeds(left*speed*leftAdjust, right*speed/leftAdjust);
-    delay(5*wait);
+    delay(wait);
     motors.setSpeeds(0, 0);
+    return 0;
 }
 
+/* Wit for a character to be available on console */
 static inline void waitConsole(){
     while (! (Console.connected() && Console.available()));
 }
 
+/* Invocable function */
 typedef struct LOGO_cmd_t {
     char name;
-    void(*procedure)(uint32_t);
+    uint32_t(*procedure)(uint32_t);
 } LOGO_cmd;
 
+/* Running command */
 struct {
     char name;
     uint32_t param;
-} command;
+} currentCommand;
 
-void   forward(uint32_t len){setSpeeds( 1,  1, len);}
-void  backward(uint32_t len){setSpeeds(-1, -1, len);}
-void  turnLeft(uint32_t len){setSpeeds(-1,  1, len);}
-void turnRight(uint32_t len){setSpeeds( 1, -1, len);}
+uint32_t   forward(uint32_t len){return setSpeeds( 1,  1, 5*len);}
+uint32_t  backward(uint32_t len){return setSpeeds(-1, -1, 5*len);}
+uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 5.3*len);}
+uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 5.3*len);}
 
+uint32_t getGroundSensor(uint32_t index){
+    if (index < 6)
+        return groundSensors[index];
+    return -1;
+}
+
+/* Robot interface */
 #define N_Commands sizeof(Commands)/sizeof(LOGO_cmd)
 LOGO_cmd Commands[] = {
     {'f', forward},
     {'b', backward},
     {'l', turnLeft},
-    {'r', turnRight}
+    {'r', turnRight},
+    {'s', getGroundSensor}
 };
 
+/* Read command from console into currentCommand */
 void readCommand(){
     waitConsole();
-    command.name = Console.read();
-    command.param = 0;
+    currentCommand.name = Console.read();
+    currentCommand.param = 0;
     for (int i=0; i<4; i++){
         waitConsole();
         if (i > 0)
-            command.param <<= 8;
-        command.param += Console.read();
+            currentCommand.param <<= 8;
+        currentCommand.param += Console.read();
     }
 }
 
@@ -57,11 +81,12 @@ void setup(){
 }
 
 void loop(){
+    reflectArray.read(groundSensors);
     readCommand();
     for (int i=0; i<N_Commands; i++){
-        if (Commands[i].name == command.name){
-            Commands[i].procedure(command.param);
-            Console.println(command.name);
+        if (Commands[i].name == currentCommand.name){
+            uint32_t res = Commands[i].procedure(currentCommand.param);
+            Console.println(res);
             return;
         }
     }
