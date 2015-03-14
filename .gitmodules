@@ -1,3 +1,6 @@
 [submodule "lib"]
-	path = arduino/lib
+	path = arduino/lib/Zumo
 	url = https://github.com/pololu/zumo-shield.git
+[submodule "arduino/lib/LSM303"]
+	path = arduino/lib/LSM303
+	url = https://github.com/pololu/LSM303
