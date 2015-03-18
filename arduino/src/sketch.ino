@@ -7,7 +7,7 @@
 float leftAdjust = 1.04;
 
 /* Motors base speed */
-static int speed = 150;
+static int speed = 200;
 
 /* Ground sensors result array */
 static unsigned int groundSensors[6];
@@ -42,8 +42,8 @@ struct {
 
 uint32_t   forward(uint32_t len){return setSpeeds( 1,  1, 5*len);}
 uint32_t  backward(uint32_t len){return setSpeeds(-1, -1, 5*len);}
-uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 5.3*len);}
-uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 5.3*len);}
+uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 4.10*len);}
+uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 3.95*len);}
 
 uint32_t getGroundSensor(uint32_t index){
     if (index < 6)
