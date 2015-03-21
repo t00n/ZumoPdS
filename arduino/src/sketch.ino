@@ -46,8 +46,10 @@ uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 5.3*len);}
 uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 5.3*len);}
 
 uint32_t getGroundSensor(uint32_t index){
-    if (index < 6)
+    if (index < 6){
+        reflectArray.read(groundSensors);
         return groundSensors[index];
+    }
     return -1;
 }
 
