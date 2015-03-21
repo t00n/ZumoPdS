@@ -80,6 +80,8 @@ def main():
         P(backward, 1, "re"),  P(backward, 1, "recule"),
         P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
         P(getGroundSensor, 1, "sol"),
+        P(lambda: getGroundSensor(0)+getGroundSensor(1) < 900, 0, "bg"),
+        P(lambda: getGroundSensor(4)+getGroundSensor(5) < 900, 0, "bd"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),
     )
