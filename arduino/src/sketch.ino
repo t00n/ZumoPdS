@@ -83,7 +83,6 @@ void setup(){
 }
 
 void loop(){
-    reflectArray.read(groundSensors);
     readCommand();
     for (int i=0; i<N_Commands; i++){
         if (Commands[i].name == currentCommand.name){
