@@ -69,8 +69,19 @@ def repl(interpreter, user_input=raw_input):
             break
 
 def main():
-    def wrap_print(text): 
+    BLACK_THRES = 1024
+
+    def wrap_print(text):
         print text
+
+    def groundSum():
+        return sum(getGroundSensor(i) for i in range(6))
+
+    def groundPurple():
+        return groundSum() < BLACK_THRES
+
+    def groundBlack():
+        return groundSum() >= BLACK_THRES
 
     P = Primitive
     primitives_fr = (
@@ -79,9 +90,8 @@ def main():
         P(forward, 1, "av"),   P(forward, 1, "avance"),
         P(backward, 1, "re"),  P(backward, 1, "recule"),
         P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
-        P(getGroundSensor, 1, "sol"),
-        P(lambda: getGroundSensor(0)+getGroundSensor(1) < 900, 0, "bg"),
-        P(lambda: getGroundSensor(4)+getGroundSensor(5) < 900, 0, "bd"),
+        P(groundPurple, 0, "mauve"), P(groundBlack, 0, "noir"),
+        P(getGroundSensor, 1, "sol"), P(groundSum, 0, "lesol"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),
     )
