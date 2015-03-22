@@ -16,7 +16,7 @@ ZumoMotors motors;
 ZumoReflectanceSensorArray reflectArray(ZUMO_SENSOR_ARRAY_DEFAULT_EMITTER_PIN);
 
 /* Helper to set motors speeds */
-static inline uint32_t setSpeeds(int left, int right, int wait){
+static inline uint32_t setSpeeds(float left, float right, int wait){
     motors.setSpeeds(left*speed*leftAdjust, right*speed/leftAdjust);
     delay(wait);
     motors.setSpeeds(0, 0);
@@ -40,10 +40,10 @@ struct {
     uint32_t param;
 } currentCommand;
 
-uint32_t   forward(uint32_t len){return setSpeeds( 1,  1, 5*len);}
-uint32_t  backward(uint32_t len){return setSpeeds(-1, -1, 5*len);}
-uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 4.10*len);}
-uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 3.95*len);}
+uint32_t   forward(uint32_t len){return setSpeeds( 1.07,  1, 10+5*len);}
+uint32_t  backward(uint32_t len){return setSpeeds(-1.1, -1, 10+5*len);}
+uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+4.20*len);}
+uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.75*len);}
 
 uint32_t getGroundSensor(uint32_t index){
     if (index < 6){
