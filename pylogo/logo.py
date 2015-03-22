@@ -131,6 +131,12 @@ def conditional(condition, consequence, alternate):
             return alternate(env)
     return f
 
+def logo_while(condition, body):
+    def f(env):
+        while condition(env):
+            body(env)
+    return f
+
 class Evaluator(object):
     Keywords_fr = {
         "LOOP": "repete", 
@@ -138,7 +144,8 @@ class Evaluator(object):
         "END_PROC": "fin",
         "IF": "si", 
         "ELSE": "sinon",
-        "MAKE_VAR": "donne"
+        "MAKE_VAR": "donne",
+        "WHILE": "tantque"
     }
 
     Builtin_operators = {
@@ -283,6 +290,17 @@ class Evaluator(object):
             raise UnterminatedExpression("Missing matching ')'")
         return expr, i+1
 
+    def analyze_while(self, tokens, i):
+        try:
+            cond, i = self.analyze(tokens, i)
+        except IndexError:
+            raise UnterminatedExpression("Missing condition for while")
+        try:
+            body, i = self.analyze(tokens, i)
+        except IndexError:
+            raise UnterminatedExpression("Missing body for while")
+        return logo_while(cond, body), i
+
     def analyze(self, tokens, i):
         """
         analyze(tokens, index) -> (lambda(env), next index)
@@ -314,6 +332,9 @@ class Evaluator(object):
 
         elif tok == self.keywords["MAKE_VAR"]:
             res, i = self.analyze_var(tokens, i)
+
+        elif tok == self.keywords["WHILE"]:
+            res, i = self.analyze_while(tokens, i)
 
         elif tok in self.env and isinstance(self.env[tok], Callable):
             res, i = self.analyze_call(self.env[tok], tokens, i)
