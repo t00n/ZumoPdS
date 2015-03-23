@@ -27,6 +27,9 @@ class ProgramError(Exception):
 class UnknowIdentifier(ProgramError):
     pass
 
+class TrollException(Exception):
+    pass
+
 
 class Env(object):
     """An environment object, referencing its outer environment"""
@@ -180,6 +183,8 @@ class Evaluator(object):
             res = const(int(numbrepr))
         except ValueError:
             res = const(float(numbrepr))
+        if res > 1000:
+            raise TrollException("Number too high")
         return res, i
 
     def analyze_list(self, tokens, i):
