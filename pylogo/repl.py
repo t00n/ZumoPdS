@@ -1,6 +1,6 @@
 from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException
 from sys import argv, stdin
-from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor
+from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic
 import traceback
 import math
 import os
@@ -56,10 +56,12 @@ def repl(interpreter, user_input=raw_input):
             print "\033[31;1m[ERROR]\033[0m Syntax error in code"
             print "%s: %s" % (err.__class__.__name__, err)
             text, prompt = "", first_prompt
+            playMusic()
         except ProgramError as err:
             print "\033[31;1m[ERROR]\033[0m Error while running program"
             print "%s: %s" % (err.__class__.__name__, err)
             text, prompt = "", first_prompt
+            playMusic()
         except KeyboardInterrupt:
             print
             text, prompt = "", first_prompt

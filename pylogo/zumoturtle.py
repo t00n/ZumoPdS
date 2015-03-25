@@ -34,6 +34,9 @@ try:
     def turnRight(angle):
         send_cmd("r", angle*rotation_adjust)
 
+    def playMusic():
+        send_cmd("p", 0)
+
     def getGroundSensor(index):
         return int(send_cmd("s", index))
 

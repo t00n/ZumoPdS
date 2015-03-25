@@ -2,6 +2,7 @@
 #include <QTRSensors.h>
 #include <ZumoReflectanceSensorArray.h>
 #include <Console.h>
+#include <ZumoBuzzer.h>
 
 /* Adjust coef for left/right motors not running at the same speed */
 float leftAdjust = 1.00;
@@ -14,6 +15,7 @@ static unsigned int groundSensors[6];
 
 ZumoMotors motors;
 ZumoReflectanceSensorArray reflectArray(ZUMO_SENSOR_ARRAY_DEFAULT_EMITTER_PIN);
+ZumoBuzzer buzzer;
 
 /* Helper to set motors speeds */
 static inline uint32_t setSpeeds(float left, float right, int wait){
@@ -44,6 +46,10 @@ uint32_t   forward(uint32_t len){return setSpeeds( 1.08,  1, 10+5*len);}
 uint32_t  backward(uint32_t len){return setSpeeds(-1.15, -1, 10+5*len);}
 uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+3.85*len);}
 uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.98*len);}
+uint32_t playMusic(uint32_t unused){
+    buzzer.play("! T220 L8 O4 C4F.C16FA O5 C4 R8 C16D16 C O4 A# A G A4");
+    return 0;
+}
 
 uint32_t getGroundSensor(uint32_t index){
     if (index < 6){
@@ -60,7 +66,8 @@ LOGO_cmd Commands[] = {
     {'b', backward},
     {'l', turnLeft},
     {'r', turnRight},
-    {'s', getGroundSensor}
+    {'s', getGroundSensor},
+    {'p', playMusic}
 };
 
 /* Read command from console into currentCommand */
