@@ -4,7 +4,7 @@
 #include <Console.h>
 
 /* Adjust coef for left/right motors not running at the same speed */
-float leftAdjust = 1.04;
+float leftAdjust = 1.00;
 
 /* Motors base speed */
 static int speed = 200;
@@ -40,10 +40,10 @@ struct {
     uint32_t param;
 } currentCommand;
 
-uint32_t   forward(uint32_t len){return setSpeeds( 1.07,  1, 10+5*len);}
+uint32_t   forward(uint32_t len){return setSpeeds( 1.05,  1, 10+5*len);}
 uint32_t  backward(uint32_t len){return setSpeeds(-1.1, -1, 10+5*len);}
-uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+4.20*len);}
-uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.75*len);}
+uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+3.85*len);}
+uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.98*len);}
 
 uint32_t getGroundSensor(uint32_t index){
     if (index < 6){

@@ -6,6 +6,10 @@ try:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((HOST, PORT))
     atexit.register(sock.close)
+    try:
+        from zumoadjust import rotation_adjust
+    except:
+        rotation_adjust = 1.0
 
     def send_cmd(cmd, param):
         param = int(param)
@@ -25,10 +29,10 @@ try:
         send_cmd("b", length)
 
     def turnLeft(angle):
-        send_cmd("l", angle)
+        send_cmd("l", angle*rotation_adjust)
 
     def turnRight(angle):
-        send_cmd("r", angle)
+        send_cmd("r", angle*rotation_adjust)
 
     def getGroundSensor(index):
         return int(send_cmd("s", index))
