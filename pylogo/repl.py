@@ -48,7 +48,8 @@ def repl(interpreter, user_input=raw_input):
             text += user_input(prompt)
             retval = interpreter.eval(text)
             text, prompt = "", first_prompt
-            print " =>", retval
+            if retval is not None:
+                print " =>", retval
         except UnterminatedExpression:
             text += "\n"
             prompt = cont_prompt
