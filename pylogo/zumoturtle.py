@@ -48,5 +48,5 @@ except Exception as err:
             print text, args
         return f
 
-    for f in ('forward', 'backward', 'turnLeft', 'turnRight', 'getGroundSensor'):
+    for f in ('forward', 'backward', 'turnLeft', 'turnRight', 'getGroundSensor', 'playMusic'):
         globals()[f] = do_print(f)
