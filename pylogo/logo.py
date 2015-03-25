@@ -27,7 +27,7 @@ class ProgramError(Exception):
 class UnknowIdentifier(ProgramError):
     pass
 
-class TrollException(Exception):
+class TrollException(ProgramError):
     pass
 
 
@@ -183,8 +183,6 @@ class Evaluator(object):
             res = const(int(numbrepr))
         except ValueError:
             res = const(float(numbrepr))
-        if res > 1000:
-            raise TrollException("Number too high")
         return res, i
 
     def analyze_list(self, tokens, i):
