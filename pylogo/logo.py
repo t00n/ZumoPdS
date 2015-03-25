@@ -121,9 +121,10 @@ def sequentially(functions):
 def repetition(times, func):
     """Return a lambda(env) executing a function multiple times"""
     def f(env):
-        for i in range(times):
+        n = times(env)
+        for i in range(n):
             func(env)
-        return times
+        return n
     return f
 
 def conditional(condition, consequence, alternate):
@@ -255,13 +256,13 @@ class Evaluator(object):
             raise UnterminatedExpression(msg)
         return lambda env: procedure.call(env, map(lambda x: x(env), args)), i
 
-    def analyze_loop(self, tokens, i):
+    def analyze_repetition(self, tokens, i):
         try:
-            times = int(tokens[i])
+            times, i = self.analyze(tokens, i)
         except IndexError:
             raise UnterminatedExpression("Missing loop count")
         try:
-            expr, i = self.analyze(tokens, i+1)
+            expr, i = self.analyze(tokens, i)
         except IndexError:
             raise UnterminatedExpression("Missing loop body")
         return repetition(times, expr), i
@@ -328,7 +329,7 @@ class Evaluator(object):
             res, i = self.analyze_if(tokens, i)
 
         elif tok == self.keywords["LOOP"]:
-            res, i = self.analyze_loop(tokens, i)
+            res, i = self.analyze_repetition(tokens, i)
 
         elif tok == self.keywords["DEF_PROC"]:
             res, i = self.analyze_procedure(tokens, i)
