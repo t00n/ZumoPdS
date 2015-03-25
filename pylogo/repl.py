@@ -53,9 +53,16 @@ def repl(interpreter, user_input=raw_input):
             text += "\n"
             prompt = cont_prompt
         except UnknowIdentifier as err:
-            print "\033[31;1mERREUR: je ne sais pas ce qu'est \033[33m%s\033[0m" % (err)
+            print "\033[31;1mJe ne sais pas ce qu'est \033[33m%s\033[0m" % (err)
             text, prompt = "", first_prompt
             playMusic()
+        except UnknowIdentifier as err:
+            print "\033[31;1mJe ne sais pas ce qu'est \033[33m%s\033[0m" % (err)
+            text, prompt = "", first_prompt
+            playMusic()
+        except TrollException as err:
+            print "\033[1;33m", str(err), "\033[31mc'est beaucoup trop grand Oo\033[0m"
+            text, prompt = "", first_prompt
         except KeyboardInterrupt:
             print
             text, prompt = "", first_prompt
@@ -66,7 +73,7 @@ def repl(interpreter, user_input=raw_input):
         except Exception as err:
             if "invalid literal" in str(err):
                 litteral = str(err).split(':')[-1].strip()
-                print "\033[31;1mERREUR dans le nombre \033[33m%s\033[0m" % (litteral)
+                print "\033[31;1mJe ne comprends pas le nombre \033[33m%s\033[0m" % (litteral)
                 playMusic()
             else:
                 print "\033[31;1m[ERROR]\033[0m", "%s: %s" % (err.__class__.__name__, err)
@@ -89,7 +96,7 @@ def main():
         def f(*args):
             for arg in args:
                 if arg > 1000:
-                    raise TrollException("Number too high")
+                    raise TrollException(arg)
             return func(*args)
         return f
 
