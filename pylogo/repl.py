@@ -69,6 +69,9 @@ def repl(interpreter, user_input=raw_input):
         except EOFError:
             print
             break
+        except Exception as err:
+            print "\033[31;1m[ERROR]\033[0m", "%s: %s" % (err.__class__.__name__, err)
+            text, prompt = "", first_prompt
 
 def main():
     BLACK_THRES = 1024
