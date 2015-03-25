@@ -40,8 +40,8 @@ struct {
     uint32_t param;
 } currentCommand;
 
-uint32_t   forward(uint32_t len){return setSpeeds( 1.05,  1, 10+5*len);}
-uint32_t  backward(uint32_t len){return setSpeeds(-1.1, -1, 10+5*len);}
+uint32_t   forward(uint32_t len){return setSpeeds( 1.08,  1, 10+5*len);}
+uint32_t  backward(uint32_t len){return setSpeeds(-1.15, -1, 10+5*len);}
 uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+3.85*len);}
 uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.98*len);}
 
