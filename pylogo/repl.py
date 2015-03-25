@@ -1,4 +1,4 @@
-from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException
+from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException, UnknowIdentifier
 from sys import argv, stdin
 from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic
 import traceback
@@ -52,14 +52,8 @@ def repl(interpreter, user_input=raw_input):
         except UnterminatedExpression:
             text += "\n"
             prompt = cont_prompt
-        except ParseError as err:
-            print "\033[31;1m[ERROR]\033[0m Syntax error in code"
-            print "%s: %s" % (err.__class__.__name__, err)
-            text, prompt = "", first_prompt
-            playMusic()
-        except ProgramError as err:
-            print "\033[31;1m[ERROR]\033[0m Error while running program"
-            print "%s: %s" % (err.__class__.__name__, err)
+        except UnknowIdentifier as err:
+            print "\033[31;1mERREUR: je ne sais pas ce qu'est \033[33m%s\033[0m" % (err)
             text, prompt = "", first_prompt
             playMusic()
         except KeyboardInterrupt:
