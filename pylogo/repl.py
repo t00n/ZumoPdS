@@ -1,4 +1,4 @@
-from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError
+from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException
 from sys import argv, stdin
 from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor
 import traceback
@@ -83,12 +83,23 @@ def main():
     def groundBlack():
         return groundSum() >= BLACK_THRES
 
+    def preventTroll(func):
+        """Not funny to have high forward values"""
+        def f(*args):
+            for arg in args:
+                if arg > 1000:
+                    raise TrollException("Number too high")
+            return func(*args)
+        return f
+
     P = Primitive
+    T = preventTroll
+
     primitives_fr = (
-        P(turnLeft, 1, "ga"),  P(turnLeft, 1, "gauche"),
-        P(turnRight, 1, "dr"), P(turnRight, 1, "droite"),
-        P(forward, 1, "av"),   P(forward, 1, "avance"),
-        P(backward, 1, "re"),  P(backward, 1, "recule"),
+        P(T(turnLeft), 1, "ga"),  P(T(turnLeft), 1, "gauche"),
+        P(T(turnRight), 1, "dr"), P(T(turnRight), 1, "droite"),
+        P(T(forward), 1, "av"),   P(T(forward), 1, "avance"),
+        P(T(backward), 1, "re"),  P(T(backward), 1, "recule"),
         P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
         P(groundPurple, 0, "mauve"), P(groundBlack, 0, "noir"),
         P(getGroundSensor, 1, "sol"), P(groundSum, 0, "lesol"),

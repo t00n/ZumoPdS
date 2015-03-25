@@ -27,6 +27,9 @@ class ProgramError(Exception):
 class UnknowIdentifier(ProgramError):
     pass
 
+class TrollException(ProgramError):
+    pass
+
 
 class Env(object):
     """An environment object, referencing its outer environment"""
