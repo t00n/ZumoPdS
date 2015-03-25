@@ -59,6 +59,14 @@ uint32_t getGroundSensor(uint32_t index){
     return -1;
 }
 
+uint32_t getGroundSensorSum(uint32_t unused){
+    uint32_t res = 0;
+    reflectArray.read(groundSensors);
+    for (int i=0; i<6; i++)
+        res += groundSensors[i];
+    return res;
+}
+
 /* Robot interface */
 #define N_Commands sizeof(Commands)/sizeof(LOGO_cmd)
 LOGO_cmd Commands[] = {
@@ -67,6 +75,7 @@ LOGO_cmd Commands[] = {
     {'l', turnLeft},
     {'r', turnRight},
     {'s', getGroundSensor},
+    {'a', getGroundSensorSum},
     {'p', playMusic}
 };
 

@@ -1,6 +1,6 @@
 from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException, UnknowIdentifier
 from sys import argv, stdin
-from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic
+from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, getGroundSensorSum
 import traceback
 import math
 import os
@@ -77,14 +77,11 @@ def main():
     def wrap_print(text):
         print text
 
-    def groundSum():
-        return sum(getGroundSensor(i) for i in range(6))
-
     def groundPurple():
-        return groundSum() < BLACK_THRES
+        return getGroundSensorSum() < BLACK_THRES
 
     def groundBlack():
-        return groundSum() >= BLACK_THRES
+        return getGroundSensorSum() >= BLACK_THRES
 
     def preventTroll(func):
         """Not funny to have high forward values"""
@@ -105,7 +102,7 @@ def main():
         P(T(backward), 1, "re"),  P(T(backward), 1, "recule"),
         P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
         P(groundPurple, 0, "mauve"), P(groundBlack, 0, "noir"),
-        P(getGroundSensor, 1, "sol"), P(groundSum, 0, "lesol"),
+        P(getGroundSensor, 1, "sol"), P(getGroundSensorSum, 0, "lesol"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),
     )

@@ -40,6 +40,9 @@ try:
     def getGroundSensor(index):
         return int(send_cmd("s", index))
 
+    def getGroundSensorSum():
+        return int(send_cmd("a", 0))
+
 except Exception as err:
     print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
 
