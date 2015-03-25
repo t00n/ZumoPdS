@@ -64,7 +64,11 @@ def repl(interpreter, user_input=raw_input):
             print
             break
         except Exception as err:
-            print "\033[31;1m[ERROR]\033[0m", "%s: %s" % (err.__class__.__name__, err)
+            if "invalid literal" in str(err):
+                litteral = str(err).split(':')[-1].strip()
+                print "\033[31;1mERREUR dans le nombre \033[33m%s\033[0m" % (litteral)
+            else:
+                print "\033[31;1m[ERROR]\033[0m", "%s: %s" % (err.__class__.__name__, err)
             text, prompt = "", first_prompt
 
 def main():
