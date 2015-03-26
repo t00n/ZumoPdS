@@ -109,7 +109,7 @@ def logo_list(expressions):
 
 def sequentially(functions):
     """
-    Return a lambda(env) executing functions sequentially, 
+    Return a lambda(env) executing functions sequentially,
     returning the last one retval
     """
     if len(functions) > 1:
@@ -143,10 +143,10 @@ def logo_while(condition, body):
 
 class Evaluator(object):
     Keywords_fr = {
-        "LOOP": "repete", 
+        "LOOP": "repete",
         "DEF_PROC": "pour",
         "END_PROC": "fin",
-        "IF": "si", 
+        "IF": "si",
         "ELSE": "sinon",
         "MAKE_VAR": "donne",
         "WHILE": "tantque"
@@ -181,7 +181,7 @@ class Evaluator(object):
     def analyze_number(self, numbrepr, tokens, i):
         res = None
         try:
-            res = const(int(numbrepr))
+            res = const(int(numbrepr,0))
         except ValueError:
             res = const(float(numbrepr))
         return res, i
@@ -194,7 +194,7 @@ class Evaluator(object):
                 expr.append(e)
         except IndexError:
             raise UnterminatedExpression("Unterminated list")
-        
+
         return logo_list(expr), i+1
 
     def analyze_procedure(self, tokens, i):
@@ -214,7 +214,7 @@ class Evaluator(object):
                 f, i = self.analyze(tokens, i)
                 funcs.append(f)
             body = sequentially(filter(lambda x: x is not None, funcs))
-            
+
             # Then bind its actual body
             self.env[name].body = body
             return None, i+1
@@ -342,7 +342,7 @@ class Evaluator(object):
 
         elif tok in self.env and isinstance(self.env[tok], Callable):
             res, i = self.analyze_call(self.env[tok], tokens, i)
-            
+
         else:
             res, i = Env.lookup(tok), i
 
