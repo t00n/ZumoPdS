@@ -67,6 +67,12 @@ uint32_t getGroundSensorSum(uint32_t unused){
     return res;
 }
 
+uint32_t changeLeftAdjust(uint32_t ratio){
+    uint32_t res = 0;
+    leftAdjust = ((float) ratio)/1000.0;
+    return res;
+}
+
 /* Robot interface */
 #define N_Commands sizeof(Commands)/sizeof(LOGO_cmd)
 LOGO_cmd Commands[] = {
@@ -76,7 +82,8 @@ LOGO_cmd Commands[] = {
     {'r', turnRight},
     {'s', getGroundSensor},
     {'a', getGroundSensorSum},
-    {'p', playMusic}
+    {'p', playMusic},
+    {'c', changeLeftAdjust}
 };
 
 /* Read command from console into currentCommand */
