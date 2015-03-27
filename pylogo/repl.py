@@ -13,10 +13,6 @@ def repl_init_readline(interpreter):
         if state == 0:
             Autocomplete = filter(lambda x: x.startswith(text), interpreter.env.keys())
         return Autocomplete[state]
-        try:
-            return match[state]
-        except IndexError as err:
-            return None
 
     try:
         import readline
@@ -40,7 +36,7 @@ def repl_init_readline(interpreter):
 def repl(interpreter, user_input=raw_input):
     repl_init_readline(interpreter)
 
-    first_prompt = " \033[1m(\033[31ml\033[32mo\033[33mg\033[34mo\033[0;1m)\033[0m > "
+    first_prompt = " \001\033[1m\002(\001\033[31m\002l\001\033[32m\002o\001\033[33m\002g\001\033[34m\002o\001\033[0;1\002m)\001\033[0m \002> "
     cont_prompt  = "    ... > "
     text, prompt = "", first_prompt
     while True:
