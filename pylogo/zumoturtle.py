@@ -7,9 +7,10 @@ try:
     sock.connect((HOST, PORT))
     atexit.register(sock.close)
     try:
-        from zumoadjust import rotation_adjust
+        from zumoadjust import rotation_adjust, left_adjust
     except:
         rotation_adjust = 1.0
+        left_adjust = 1.0
 
     def send_cmd(cmd, param):
         param = int(param)
@@ -34,6 +35,9 @@ try:
     def turnRight(angle):
         send_cmd("r", angle*rotation_adjust)
 
+    def changeLeftAdjust(ratio):
+        send_cmd("c", int(ratio*1000))
+
     def playMusic():
         send_cmd("p", 0)
 
@@ -43,6 +47,9 @@ try:
     def getGroundSensorSum():
         return int(send_cmd("a", 0))
 
+    # adapt left/right motors speed for each robot    
+    changeLeftAdjust(left_adjust)
+    
 except Exception as err:
     print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
 
