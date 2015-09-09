@@ -30,10 +30,27 @@ Code pour l'atelier "Programmation de robots" organisé par UrLab au
 * Tools > Serial Port > Robot @ 192.168.240.1
 * Cliquer sur le bouton "upload"
 
+### Calibrer le zumo
+* Ajouter un fichier zumoadjust.py dans le dossier pylogo qui contient : 
+* ROTATION_ADJUST : ratio vitesse du moteur gauche par rapport au droit lors des rotations
+* LEFT_ADJUST : ration vitesse du moteur gauche par rapport au droit lors de l'avancement du zumo
+* BLACK_THRES : valeur des capteurs au dessus de laquelle le sol est considéré noir
+
 ### Tester le script carre.logo
 
     cd pylogo
     make run
+
+### Lancer l'interpréteur logo
+
+* Créer un tunnel ssh vers le zumo
+
+    ssh -L 6571:localhost:6571 root@192.168.240.1 (en utilisant le mot de passe du zumo configuré précédemment)
+
+* Lancer l'interpréteur (depuis son ordinateur, pas depuis le zumo)
+
+    cd pylogo
+    python2 repl.py
 
 ## Ressources
 
