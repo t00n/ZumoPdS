@@ -1,6 +1,6 @@
 from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException, UnknowIdentifier
 from sys import argv, stdin
-from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, getGroundSensorSum
+from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, getGroundSensorSum, BLACK_THRES
 import traceback
 import math
 import os
@@ -77,7 +77,6 @@ def repl(interpreter, user_input=raw_input):
             text, prompt = "", first_prompt
 
 def main():
-    BLACK_THRES = 1024
 
     def wrap_print(text):
         print text
