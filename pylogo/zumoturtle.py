@@ -7,10 +7,11 @@ try:
     sock.connect((HOST, PORT))
     atexit.register(sock.close)
     try:
-        from zumoadjust import rotation_adjust, left_adjust
+        from zumoadjust import ROTATION_ADJUST, LEFT_ADJUST, BLACK_THRES
     except:
-        rotation_adjust = 1.0
-        left_adjust = 1.0
+        ROTATION_ADJUST = 1.0
+        LEFT_ADJUST = 1.0
+        BLACK_THRES = 2048
 
     def send_cmd(cmd, param):
         param = int(param)
@@ -30,10 +31,10 @@ try:
         send_cmd("b", length)
 
     def turnLeft(angle):
-        send_cmd("l", angle*rotation_adjust)
+        send_cmd("l", angle*ROTATION_ADJUST)
 
     def turnRight(angle):
-        send_cmd("r", angle*rotation_adjust)
+        send_cmd("r", angle*ROTATION_ADJUST)
 
     def changeLeftAdjust(ratio):
         send_cmd("c", int(ratio*1000))
@@ -48,7 +49,7 @@ try:
         return int(send_cmd("a", 0))
 
     # adapt left/right motors speed for each robot    
-    changeLeftAdjust(left_adjust)
+    changeLeftAdjust(LEFT_ADJUST)
     
 except Exception as err:
     print "\033[33;1m[WARNING]\033[0m No Arduino YUN Bridge:", str(err)
