@@ -6,16 +6,14 @@ LEFICHIERQUITUE = "zumoadjust.py"
 def vtff():
     print "Va te faire foutre, gros con, reponds a ma question !"
 
-def nettoyage():
+def recyclage():
     try:
-        os.remove(LEFICHIERQUITUE)
+        from zumoadjust import LEFT_ADJUST, ROTATION_ADJUST, BLACK_THRES
+        return LEFT_ADJUST, ROTATION_ADJUST, BLACK_THRES
     except:
-        caca = "lol"
+        return 1.0, 1.0, 2048
 
-def adjustLeft():
-    print "Mettez le Zumo face a une ligne noire et de preference pas contre un mur"
-    raw_input()
-    left_adjust = 1.0
+def adjustLeft(left_adjust):
     while True:
         forward(400)
         print "Est-ce que le Zumo a ete parfaitement droit (1), a gauche (2) ou a droite (3) ?"
@@ -32,9 +30,7 @@ def adjustLeft():
         changeLeftAdjust(left_adjust)
     return left_adjust
 
-def adjustRotation():
-    rotation_adjust = 1.0
-
+def adjustRotation(rotation_adjust):
     while True:
         turnLeft(720*rotation_adjust)
         print "De combien de degres le Zumo a-t-il tourne (+-) ? (2 tours == 720 degres Celsius espece de noob)"
@@ -58,10 +54,12 @@ def onpollueledisque(a, b, c):
         f.write("BLACK_THRES=%d\n" % c) # TODO
 
 def main():
-    nettoyage()
-    left_adjust = adjustLeft()
-    rotation_adjust = adjustRotation()
-    onpollueledisque(left_adjust, rotation_adjust, 2048)
+    print "Mettez le Zumo face a une ligne noire et de preference pas contre un mur"
+    raw_input()
+    left_adjust, rotation_adjust, black_thres = recyclage()
+    left_adjust = adjustLeft(left_adjust)
+    rotation_adjust = adjustRotation(rotation_adjust)
+    onpollueledisque(left_adjust, rotation_adjust, black_thres)
 
 if __name__ == '__main__':
     main()
