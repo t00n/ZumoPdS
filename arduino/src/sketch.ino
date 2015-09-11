@@ -19,7 +19,7 @@ ZumoBuzzer buzzer;
 
 /* Helper to set motors speeds */
 static inline uint32_t setSpeeds(float left, float right, int wait){
-    motors.setSpeeds(left*speed*leftAdjust, right*speed/leftAdjust);
+    motors.setSpeeds(left*speed*leftAdjust, right*speed);
     delay(wait);
     motors.setSpeeds(0, 0);
     return 0;
@@ -42,10 +42,10 @@ struct {
     uint32_t param;
 } currentCommand;
 
-uint32_t   forward(uint32_t len){return setSpeeds( 1.08,  1, 10+5*len);}
-uint32_t  backward(uint32_t len){return setSpeeds(-1.15, -1, 10+5*len);}
+uint32_t   forward(uint32_t len){return setSpeeds( 1,  1, 10+5*len);}
+uint32_t  backward(uint32_t len){return setSpeeds(-1, -1, 10+5*len);}
 uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+3.85*len);}
-uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.98*len);}
+uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.85*len);}
 uint32_t playMusic(uint32_t unused){
     buzzer.play("! T220 L8 O4 C4F.C16FA O5 C4 R8 C16D16 C O4 A# A G A4");
     return 0;
