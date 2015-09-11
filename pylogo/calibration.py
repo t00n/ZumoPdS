@@ -14,19 +14,24 @@ def recyclage():
         return 1.0, 1.0, 2048
 
 def adjustLeft(left_adjust):
+    adjustement = 0.1
+    last_choice = "1"
     while True:
         forward(400)
         print "Est-ce que le Zumo a ete parfaitement droit (1), a gauche (2) ou a droite (3) ?"
         test_forward = raw_input()
         backward(400)
+        if test_forward != last_choice:
+            adjustement /= 2
         if test_forward == "1":
             break
         elif test_forward == "2":
-            left_adjust += 0.05
+            left_adjust += adjustement
         elif test_forward == "3":
-            left_adjust -= 0.05
+            left_adjust -= adjustement
         else:
             vtff()
+        last_choice = test_forward
         changeLeftAdjust(left_adjust)
     return left_adjust
 
