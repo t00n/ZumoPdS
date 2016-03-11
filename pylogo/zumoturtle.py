@@ -46,10 +46,11 @@ try:
         send_cmd("p", 0)
 
     def getGroundSensor(index):
+        time.sleep(0.001)
         res = 4294967295
         while res == 4294967295:
             res = int(send_cmd("s", index))
-            time.sleep(0.2)
+            time.sleep(0.001)
         return res
 
     def getGroundSensorSum():

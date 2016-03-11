@@ -85,19 +85,25 @@ def main():
         return not groundBlack()
 
     def groundBlack():
-        return getGroundSensorSum()/6 >= BLACK_THRES
+        return groundBlackRight() or groundBlackCenter() or groundBlackLeft()
 
     def groundPurpleRight():
         return not groundBlackRight()
 
     def groundBlackRight():
-        return getGroundSensor(4) >= BLACK_THRES or getGroundSensor(5) >= BLACK_THRES
+        return getGroundSensor(5) >= BLACK_THRES
 
     def groundPurpleLeft():
         return not groundBlackLeft()
 
     def groundBlackLeft():
-        return getGroundSensor(0) >= BLACK_THRES or getGroundSensor(1) >= BLACK_THRES
+        return getGroundSensor(0) >= BLACK_THRES
+
+    def groundPurpleCenter():
+        return not groundBlackCenter()
+
+    def groundBlackCenter():
+        return getGroundSensor(1) >= BLACK_THRES or getGroundSensor(2) >= BLACK_THRES or getGroundSensor(4) >= BLACK_THRES
 
 
     def preventTroll(func):
@@ -121,6 +127,7 @@ def main():
         P(groundPurple, 0, "mauve"), P(groundBlack, 0, "noir"),
         P(groundPurpleRight, 0, "mauvedroite"), P(groundBlackRight, 0, "noirdroite"),
         P(groundPurpleLeft, 0, "mauvegauche"), P(groundBlackLeft, 0, "noirgauche"),
+        P(groundPurpleCenter, 0, "mauvecentre"), P(groundBlackCenter, 0, "noircentre"),
         P(getGroundSensor, 1, "sol"), P(getGroundSensorSum, 0, "lesol"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),
