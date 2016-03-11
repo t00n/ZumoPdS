@@ -82,25 +82,25 @@ def main():
         print text
 
     def groundPurple():
-        return not groundBlack()
+        return groundPurpleRight() or groundPurpleCenter() or groundPurpleLeft()
 
     def groundBlack():
         return groundBlackRight() or groundBlackCenter() or groundBlackLeft()
 
     def groundPurpleRight():
-        return not groundBlackRight()
+        return getGroundSensor(5) < BLACK_THRES
 
     def groundBlackRight():
         return getGroundSensor(5) >= BLACK_THRES
 
     def groundPurpleLeft():
-        return not groundBlackLeft()
+        return getGroundSensor(0) < BLACK_THRES
 
     def groundBlackLeft():
         return getGroundSensor(0) >= BLACK_THRES
 
     def groundPurpleCenter():
-        return not groundBlackCenter()
+        return getGroundSensor(1) < BLACK_THRES or getGroundSensor(2) < BLACK_THRES or getGroundSensor(4) < BLACK_THRES
 
     def groundBlackCenter():
         return getGroundSensor(1) >= BLACK_THRES or getGroundSensor(2) >= BLACK_THRES or getGroundSensor(4) >= BLACK_THRES
