@@ -1,17 +1,20 @@
+
+try:
+    from zumoadjust import ROTATION_ADJUST, LEFT_ADJUST, BLACK_THRES
+except:
+    ROTATION_ADJUST = 1.0
+    LEFT_ADJUST = 1.0
+    BLACK_THRES = 2048
+
 try:
     import socket
     import atexit
+    import time
     HOST = 'localhost'
     PORT = 6571
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((HOST, PORT))
     atexit.register(sock.close)
-    try:
-        from zumoadjust import ROTATION_ADJUST, LEFT_ADJUST, BLACK_THRES
-    except:
-        ROTATION_ADJUST = 1.0
-        LEFT_ADJUST = 1.0
-        BLACK_THRES = 2048
 
     def send_cmd(cmd, param):
         param = int(param)
@@ -43,7 +46,11 @@ try:
         send_cmd("p", 0)
 
     def getGroundSensor(index):
-        return int(send_cmd("s", index))
+        res = 4294967295
+        while res == 4294967295:
+            res = int(send_cmd("s", index))
+            time.sleep(0.2)
+        return res
 
     def getGroundSensorSum():
         return int(send_cmd("a", 0))
@@ -57,6 +64,7 @@ except Exception as err:
     def do_print(text):
         def f(*args):
             print text, args
+            return 0
         return f
 
     for f in ('forward', 'backward', 'turnLeft', 'turnRight', 'getGroundSensor', 'playMusic', 'getGroundSensorSum'):

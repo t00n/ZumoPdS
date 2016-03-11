@@ -82,10 +82,23 @@ def main():
         print text
 
     def groundPurple():
-        return getGroundSensorSum() < BLACK_THRES
+        return not groundBlack()
 
     def groundBlack():
-        return getGroundSensorSum() >= BLACK_THRES
+        return getGroundSensorSum()/6 >= BLACK_THRES
+
+    def groundPurpleRight():
+        return not groundBlackRight()
+
+    def groundBlackRight():
+        return getGroundSensor(4) >= BLACK_THRES or getGroundSensor(5) >= BLACK_THRES
+
+    def groundPurpleLeft():
+        return not groundBlackLeft()
+
+    def groundBlackLeft():
+        return getGroundSensor(0) >= BLACK_THRES or getGroundSensor(1) >= BLACK_THRES
+
 
     def preventTroll(func):
         """Not funny to have high forward values"""
@@ -106,6 +119,8 @@ def main():
         P(T(backward), 1, "re"),  P(T(backward), 1, "recule"),
         P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
         P(groundPurple, 0, "mauve"), P(groundBlack, 0, "noir"),
+        P(groundPurpleRight, 0, "mauvedroite"), P(groundBlackRight, 0, "noirdroite"),
+        P(groundPurpleLeft, 0, "mauvegauche"), P(groundBlackLeft, 0, "noirgauche"),
         P(getGroundSensor, 1, "sol"), P(getGroundSensorSum, 0, "lesol"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),
