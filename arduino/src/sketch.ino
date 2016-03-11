@@ -12,6 +12,7 @@ static int speed = 200;
 
 /* Ground sensors result array */
 static unsigned int groundSensors[6];
+static unsigned int lastSensorRead;
 
 ZumoMotors motors;
 ZumoReflectanceSensorArray reflectArray(ZUMO_SENSOR_ARRAY_DEFAULT_EMITTER_PIN);
@@ -51,9 +52,18 @@ uint32_t playMusic(uint32_t unused){
     return 0;
 }
 
+void readGroundSensors() {
+    // caching
+    unsigned int now = millis();
+    if (now - lastSensorRead > 500) {
+        reflectArray.read(groundSensors);
+        lastSensorRead = millis();
+    }
+}
+
 uint32_t getGroundSensor(uint32_t index){
     if (index < 6){
-        reflectArray.read(groundSensors);
+        readGroundSensors();
         return groundSensors[index];
     }
     return -1;
@@ -61,7 +71,7 @@ uint32_t getGroundSensor(uint32_t index){
 
 uint32_t getGroundSensorSum(uint32_t unused){
     uint32_t res = 0;
-    reflectArray.read(groundSensors);
+    readGroundSensors();
     for (int i=0; i<6; i++)
         res += groundSensors[i];
     return res;
@@ -83,7 +93,8 @@ LOGO_cmd Commands[] = {
     {'s', getGroundSensor},
     {'a', getGroundSensorSum},
     {'p', playMusic},
-    {'c', changeLeftAdjust}
+    {'c', changeLeftAdjust},
+    {'i', getLine}
 };
 
 /* Read command from console into currentCommand */
@@ -102,6 +113,7 @@ void readCommand(){
 void setup(){
     Bridge.begin();
     Console.begin();
+    lastSensorRead = millis();
     while (! Console);
 }
 
