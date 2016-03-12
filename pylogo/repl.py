@@ -1,6 +1,6 @@
 from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException, UnknowIdentifier
 from sys import argv, stdin
-from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, getGroundSensorSum, groundPurple, groundBlack, groundPurpleRight, groundPurpleLeft, groundPurpleCenter, groundBlackRight, groundBlackLeft, groundBlackCenter, BLACK_THRES
+from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, getGroundSensorSum, groundPurple, groundBlack, groundPurpleRight, groundPurpleLeft, groundPurpleCenter, groundBlackRight, groundBlackLeft, groundBlackCenter, sensorsAbove, BLACK_THRES
 import traceback
 import math
 import os
@@ -103,6 +103,7 @@ def main():
         P(groundPurpleRight, 0, "mauvedroite"), P(groundBlackRight, 0, "noirdroite"),
         P(groundPurpleLeft, 0, "mauvegauche"), P(groundBlackLeft, 0, "noirgauche"),
         P(groundPurpleCenter, 0, "mauvecentre"), P(groundBlackCenter, 0, "noircentre"),
+        P(sensorsAbove, 2, "sensors"),
         P(getGroundSensor, 1, "sol"), P(getGroundSensorSum, 0, "lesol"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),

@@ -10,6 +10,7 @@ try:
     import socket
     import atexit
     import time
+    from struct import pack, unpack
     HOST = 'localhost'
     PORT = 6571
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,6 +46,15 @@ try:
     def playMusic():
         send_cmd("p", 0)
 
+    def sensorsAbove(threshold, sensors):
+        bitsensors = 0
+        for i in sensors:
+            assert(0 <= i < 6)
+            bitsensors |= (1 << i)
+        payload = unpack('>i', pack('>hh', threshold, bitsensors))[0]
+        x = send_cmd('t', payload)
+        return x == "1"
+
     def getGroundSensor(index):
         time.sleep(0.001)
         res = 4294967295
@@ -55,7 +65,7 @@ try:
 
     def getGroundSensorSum():
         return int(send_cmd("a", 0))
-        
+
     def groundPurple():
         return groundPurpleRight() or groundPurpleCenter() or groundPurpleLeft()
 

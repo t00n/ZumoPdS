@@ -12,7 +12,6 @@ static int speed = 200;
 
 /* Ground sensors result array */
 static unsigned int groundSensors[6];
-static unsigned int lastSensorRead;
 
 ZumoMotors motors;
 ZumoReflectanceSensorArray reflectArray(ZUMO_SENSOR_ARRAY_DEFAULT_EMITTER_PIN);
@@ -52,18 +51,23 @@ uint32_t playMusic(uint32_t unused){
     return 0;
 }
 
-void readGroundSensors() {
-    // caching
-    unsigned int now = millis();
-    if (now - lastSensorRead > 500) {
-        reflectArray.read(groundSensors);
-        lastSensorRead = millis();
+uint32_t isSensorsAboveThreshold(uint32_t params) {
+    uint16_t threshold = (params >> 16) & 0x7FF; // bits from 16 to 26
+    uint16_t sensors = params & 0x3F; // bits from 0 to 5
+    reflectArray.read(groundSensors);
+    uint32_t res = 0;
+    for (uint16_t i = 0; i < 6; ++i) {
+        if ((sensors & (1 << i)) /* do we need this sensor */
+            && groundSensors[i] >= threshold) {
+            res = 1;
+        }
     }
+    return res;
 }
 
 uint32_t getGroundSensor(uint32_t index){
     if (index < 6){
-        readGroundSensors();
+        reflectArray.read(groundSensors);
         return groundSensors[index];
     }
     return -1;
@@ -71,7 +75,7 @@ uint32_t getGroundSensor(uint32_t index){
 
 uint32_t getGroundSensorSum(uint32_t unused){
     uint32_t res = 0;
-    readGroundSensors();
+    reflectArray.read(groundSensors);
     for (int i=0; i<6; i++)
         res += groundSensors[i];
     return res;
@@ -94,7 +98,7 @@ LOGO_cmd Commands[] = {
     {'a', getGroundSensorSum},
     {'p', playMusic},
     {'c', changeLeftAdjust},
-    {'i', getLine}
+    {'t', isSensorsAboveThreshold}
 };
 
 /* Read command from console into currentCommand */
@@ -113,7 +117,6 @@ void readCommand(){
 void setup(){
     Bridge.begin();
     Console.begin();
-    lastSensorRead = millis();
     while (! Console);
 }
 
