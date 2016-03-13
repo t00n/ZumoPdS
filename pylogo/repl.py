@@ -1,6 +1,6 @@
 from logo import Primitive, Evaluator, Env, UnterminatedExpression, ProgramError, ParseError, TrollException, UnknowIdentifier
 from sys import argv, stdin
-from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, getGroundSensorSum, groundPurple, groundBlack, groundPurpleRight, groundPurpleLeft, groundPurpleCenter, groundBlackRight, groundBlackLeft, groundBlackCenter, sensorsAbove, BLACK_THRES
+from zumoturtle import forward, backward, turnLeft, turnRight, getGroundSensor, playMusic, sensorsAbove, BLACK_THRES
 import traceback
 import math
 import os
@@ -99,25 +99,23 @@ def main():
         P(T(forward), 1, "av"),   P(T(forward), 1, "avance"),
         P(T(backward), 1, "re"),  P(T(backward), 1, "recule"),
         P(wrap_print, 1, "p"), P(wrap_print, 1, "print"),
-        P(groundPurple, 0, "mauve"), P(groundBlack, 0, "noir"),
-        P(groundPurpleRight, 0, "mauvedroite"), P(groundBlackRight, 0, "noirdroite"),
-        P(groundPurpleLeft, 0, "mauvegauche"), P(groundBlackLeft, 0, "noirgauche"),
-        P(groundPurpleCenter, 0, "mauvecentre"), P(groundBlackCenter, 0, "noircentre"),
         P(sensorsAbove, 2, "sensors"),
-        P(getGroundSensor, 1, "sol"), P(getGroundSensorSum, 0, "lesol"),
+        P(getGroundSensor, 1, "sol"),
         P(math.sqrt, 1, "racine"), P(math.sqrt, 1, "rc"),
         P(exit, 0, "q"), P(exit, 0, "quit"),
     )
 
+    evaluator = Evaluator(env=Env(None, *primitives_fr))
+    evaluator.eval(open("prelude.logo").read())
     if len(argv) > 1:
         for script in argv[1:]:
             try:
-                retval = Evaluator(env=Env(None, *primitives_fr)).eval(open(script).read())
+                retval = evaluator.eval(open(script).read())
             except Exception as err:
                 print "\033[1;31m[ERROR]\033[0m in execution of", script, ":", str(err)
                 traceback.print_exc()
     else:
-        repl(Evaluator(env=Env(None, *primitives_fr)))
+        repl(evaluator)
 
 if __name__ == "__main__":
     main()

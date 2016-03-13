@@ -63,33 +63,6 @@ try:
             time.sleep(0.001)
         return res
 
-    def getGroundSensorSum():
-        return int(send_cmd("a", 0))
-
-    def groundPurple():
-        return groundPurpleRight() or groundPurpleCenter() or groundPurpleLeft()
-
-    def groundBlack():
-        return groundBlackRight() or groundBlackCenter() or groundBlackLeft()
-
-    def groundPurpleRight():
-        return getGroundSensor(5) < BLACK_THRES
-
-    def groundBlackRight():
-        return getGroundSensor(5) >= BLACK_THRES
-
-    def groundPurpleLeft():
-        return getGroundSensor(0) < BLACK_THRES
-
-    def groundBlackLeft():
-        return getGroundSensor(0) >= BLACK_THRES
-
-    def groundPurpleCenter():
-        return getGroundSensor(1) < BLACK_THRES or getGroundSensor(2) < BLACK_THRES or getGroundSensor(4) < BLACK_THRES
-
-    def groundBlackCenter():
-        return getGroundSensor(1) >= BLACK_THRES or getGroundSensor(2) >= BLACK_THRES or getGroundSensor(4) >= BLACK_THRES
-
     # adapt left/right motors speed for each robot    
     changeLeftAdjust(LEFT_ADJUST)
     
@@ -102,5 +75,5 @@ except Exception as err:
             return 0
         return f
 
-    for f in ('forward', 'backward', 'turnLeft', 'turnRight', 'getGroundSensor', 'playMusic', 'getGroundSensorSum'):
+    for f in ('forward', 'backward', 'turnLeft', 'turnRight', 'getGroundSensor', 'playMusic', 'getGroundSensorSum', 'sensorsAbove'):
         globals()[f] = do_print(f)

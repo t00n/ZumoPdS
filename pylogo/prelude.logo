@@ -1,0 +1,33 @@
+donne $ 250
+pour ng
+    sensors $ [0]
+fin
+
+
+pour nc 
+    sensors $ [1 2 4]
+fin
+
+pour nd
+    sensors $ [5]
+fin
+
+pour n
+    sensors $ [0 1 2 4 5]
+fin
+
+pour noirgauche 
+    ng
+fin
+
+pour noircentre
+    nc
+fin
+
+pour noirdroite
+    nd
+fin
+
+pour noir
+    n
+fin

@@ -8,7 +8,8 @@
 float leftAdjust = 1.00;
 
 /* Motors base speed */
-static int speed = 200;
+static int speed_max = 400;
+static int speed_min = 100;
 
 /* Ground sensors result array */
 static unsigned int groundSensors[6];
@@ -18,9 +19,28 @@ ZumoReflectanceSensorArray reflectArray(ZUMO_SENSOR_ARRAY_DEFAULT_EMITTER_PIN);
 ZumoBuzzer buzzer;
 
 /* Helper to set motors speeds */
-static inline uint32_t setSpeeds(float left, float right, int wait){
-    motors.setSpeeds(left*speed*leftAdjust, right*speed);
-    delay(wait);
+static inline uint32_t setSpeeds(float left, float right, int T){
+    if (T < 500) {
+        motors.setSpeeds(left * speed_min * leftAdjust, right * speed_min);
+        delay(T*(speed_max/speed_min));
+    }
+    else {
+        int speed = speed_min;
+        int speed_step = 10;
+        for (int t = 0; t < T; t++) {
+            if (t < (T / 3)) {
+                speed += speed_step;
+            }
+            // else if (t < (2*T) / 3) {
+
+            // }
+            else if (t >= (2*T) / 3) {
+                speed -= speed_step;
+            }
+            motors.setSpeeds(left * speed * leftAdjust, right * speed);
+            delay(1);
+        }
+    }
     motors.setSpeeds(0, 0);
     return 0;
 }
@@ -42,10 +62,10 @@ struct {
     uint32_t param;
 } currentCommand;
 
-uint32_t   forward(uint32_t len){return setSpeeds( 1,  1, 10+5*len);}
-uint32_t  backward(uint32_t len){return setSpeeds(-1, -1, 10+5*len);}
-uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 10+3.85*len);}
-uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 10+3.85*len);}
+uint32_t   forward(uint32_t len){return setSpeeds( 1,  1, 5*len);}
+uint32_t  backward(uint32_t len){return setSpeeds(-1, -1, 5*len);}
+uint32_t  turnLeft(uint32_t len){return setSpeeds(-1,  1, 5*len);}
+uint32_t turnRight(uint32_t len){return setSpeeds( 1, -1, 5*len);}
 uint32_t playMusic(uint32_t unused){
     buzzer.play("! T220 L8 O4 C4F.C16FA O5 C4 R8 C16D16 C O4 A# A G A4");
     return 0;
