@@ -20,3 +20,9 @@
 #####tantque mauve [avance 20]
 ###Expliquer comment faire un carré
 #####pour carre :taille repete 4 [avance :taille gauche 90] fin
+###Verifier si le sol à gauche est noir
+#####noirgauche
+###Verifier si le sol à droite est noir
+#####noirdroite
+###Verifier si le sol au centre est noir
+#####noircentre
